@@ -95,4 +95,4 @@ async function testarConexao() {
 window.initSupabase = initSupabase;
 window.getSupabase = getSupabase;
 window.testarConexao = testarConexao;
-initSupabase();
+window.sb = initSupabase();
