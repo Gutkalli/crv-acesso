@@ -639,14 +639,50 @@ function initAvancado() {
    AÇÕES DO CABEÇALHO
    ===================================================== */
 
-/* Mapa: seção do menu → chave no banco + label amigável + campos a limpar */
+/* Mapa: seção → chave principal no banco, label, campos obrigatórios, grupos a salvar, campos a limpar */
 const CFG_SECAO_MAP = {
-  geral:        { chave: 'empresa',       label: 'Geral (Informações da Empresa)',  limpar: ['cfg-empresa-nome','cfg-empresa-cnpj','cfg-empresa-endereco','cfg-empresa-tel'] },
-  aparencia:    { chave: 'aparencia',     label: 'Aparência',                       limpar: [] },
-  seguranca:    { chave: 'seguranca',     label: 'Segurança',                       limpar: [] },
-  notificacoes: { chave: 'notificacoes',  label: 'Notificações',                    limpar: ['cfg-email-notif','cfg-email-cc'] },
-  integracao:   { chave: 'integracao',    label: 'Integração',                      limpar: ['cfg-api-url','cfg-api-porta','cfg-api-usuario'] },
-  backup:       { chave: 'backup',        label: 'Backup',                          limpar: [] },
+  geral: {
+    chave:    'empresa',
+    label:    'Geral',
+    required: [{ id: 'cfg-empresa-nome', msg: 'O nome da empresa é obrigatório.' }],
+    grupos:   ['empresa', 'regional', 'comportamento'],
+    limpar:   ['cfg-empresa-nome','cfg-empresa-cnpj','cfg-empresa-endereco','cfg-empresa-tel'],
+  },
+  aparencia: {
+    chave:    'aparencia',
+    label:    'Aparência',
+    required: [],
+    grupos:   ['aparencia'],
+    limpar:   [],
+  },
+  seguranca: {
+    chave:    'seguranca',
+    label:    'Segurança',
+    required: [],
+    grupos:   ['seguranca'],
+    limpar:   [],
+  },
+  notificacoes: {
+    chave:    'notificacoes',
+    label:    'Notificações',
+    required: [{ id: 'cfg-email-notif', msg: 'Informe um e-mail de destino para as notificações.' }],
+    grupos:   ['notificacoes'],
+    limpar:   ['cfg-email-notif','cfg-email-cc'],
+  },
+  integracao: {
+    chave:    'integracao',
+    label:    'Integração',
+    required: [{ id: 'cfg-api-url', msg: 'Informe a URL base da API.' }],
+    grupos:   ['integracao'],
+    limpar:   ['cfg-api-url','cfg-api-porta','cfg-api-usuario'],
+  },
+  backup: {
+    chave:    'backup',
+    label:    'Backup',
+    required: [],
+    grupos:   ['backup'],
+    limpar:   [],
+  },
 };
 
 function initAcoesCabecalho() {
