@@ -691,11 +691,10 @@ async function carregarConfiguracoes() {
   setVal('cfg-inatividade',   comp.inatividade || '30');
   setCheck('cfg-som-alerta',  comp.somAlerta);
 
-  // Aparência
-  if (ap.tema) {
-    aplicarTema(ap.tema);
-    marcarTemaAtivo(ap.tema);
-  }
+  // Aparência — usa o tema salvo ou mantém o tema atual do documento
+  const temaCarregado = ap.tema || document.documentElement.getAttribute('data-theme') || 'dark';
+  aplicarTema(temaCarregado);
+  marcarTemaAtivo(temaCarregado);
   setCheck('cfg-sidebar-collapsed', ap.sidebarCollapsed);
   setCheck('cfg-anim-reduzida',     ap.animReduzida);
   setCheck('cfg-densidade',         ap.densidade);
@@ -750,7 +749,9 @@ async function salvarConfiguracoes() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ph ph-circle-notch"></i> Salvando...';
 
-  const temaSel = document.querySelector('.cfg-tema-item.active')?.dataset.tema || 'dark';
+  // Lê tema selecionado; se nenhum botão estiver ativo usa o tema atual do documento
+  const temaAtual = document.documentElement.getAttribute('data-theme') || 'dark';
+  const temaSel = document.querySelector('.cfg-tema-item.active')?.dataset.tema || temaAtual;
 
   // Coleta o logoUrl atual (não sobrescreve com vazio)
   const apAtual = (await lerChave('aparencia')) || {};
