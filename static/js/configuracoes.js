@@ -1080,9 +1080,20 @@ async function lerChave(chave) {
 
 async function salvarChave(chave, valor) {
   const supabase = getSupabaseInstance();
+
+  // Lê o valor já salvo e mescla com os novos dados
+  // assim campos não presentes no formulário não são apagados
+  const existente = await lerChave(chave) || {};
+  const merged = { ...existente, ...valor };
+
   const { error } = await supabase
     .from('configuracoes')
-    .upsert({ chave, valor, updated_at: new Date().toISOString() }, { onConflict: 'chave' });
+    .upsert(
+      { chave, valor: merged, updated_at: new Date().toISOString() },
+      { onConflict: 'chave' }
+    );
+
+  if (error) console.error(`[CFG] Erro ao salvar chave "${chave}":`, error.message);
   return !error;
 }
 
