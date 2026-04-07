@@ -73,6 +73,7 @@ onReady(() => {
   initAvancado();
   initAcoesCabecalho();
   initModalOperador();
+  initMascaras();
   carregarConfiguracoes();
   carregarOperadores();
 });
@@ -676,9 +677,9 @@ async function carregarConfiguracoes() {
 
   // Empresa
   setVal('cfg-empresa-nome',     emp.nome);
-  setVal('cfg-empresa-cnpj',     emp.cnpj);
+  setVal('cfg-empresa-cnpj',     formatarCNPJ(emp.cnpj || ''));
   setVal('cfg-empresa-endereco', emp.endereco);
-  setVal('cfg-empresa-tel',      emp.tel);
+  setVal('cfg-empresa-tel',      formatarTelefone(emp.tel || ''));
 
   // Regional
   setVal('cfg-fuso',     reg.fuso);
@@ -1145,4 +1146,75 @@ function getCheck(id) {
 function iniciais(nome) {
   if (!nome) return '?';
   return nome.split(' ').filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
+}
+
+
+/* =====================================================
+   MÁSCARAS DE ENTRADA
+   ===================================================== */
+
+/**
+ * Formata string como CNPJ: XX.XXX.XXX/XXXX-XX
+ * Aceita dígitos brutos ou já parcialmente formatados.
+ */
+function formatarCNPJ(valor) {
+  const d = valor.replace(/\D/g, '').slice(0, 14);
+  if (d.length === 0) return '';
+  return d
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2}\.\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/, '$1/$2')
+    .replace(/^(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/, '$1-$2');
+}
+
+/**
+ * Formata string como telefone brasileiro.
+ * 10 dígitos → (XX) XXXX-XXXX
+ * 11 dígitos → (XX) XXXXX-XXXX
+ */
+function formatarTelefone(valor) {
+  const d = valor.replace(/\D/g, '').slice(0, 11);
+  if (d.length === 0) return '';
+  if (d.length <= 10) {
+    return d
+      .replace(/^(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+  }
+  return d
+    .replace(/^(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+}
+
+/**
+ * Inicializa as máscaras dos campos do formulário de empresa.
+ */
+function initMascaras() {
+  // ── CNPJ ──────────────────────────────────────────
+  const cnpjEl = document.getElementById('cfg-empresa-cnpj');
+  if (cnpjEl) {
+    cnpjEl.setAttribute('maxlength', '18');   // XX.XXX.XXX/XXXX-XX = 18 chars
+    cnpjEl.setAttribute('inputmode', 'numeric');
+    cnpjEl.addEventListener('input', function () {
+      const pos = this.selectionStart;
+      const prev = this.value.length;
+      this.value = formatarCNPJ(this.value);
+      // Mantém cursor em posição razoável após formatação
+      const diff = this.value.length - prev;
+      this.setSelectionRange(pos + diff, pos + diff);
+    });
+  }
+
+  // ── Telefone ───────────────────────────────────────
+  const telEl = document.getElementById('cfg-empresa-tel');
+  if (telEl) {
+    telEl.setAttribute('maxlength', '15');    // (XX) XXXXX-XXXX = 15 chars
+    telEl.setAttribute('inputmode', 'numeric');
+    telEl.addEventListener('input', function () {
+      const pos = this.selectionStart;
+      const prev = this.value.length;
+      this.value = formatarTelefone(this.value);
+      const diff = this.value.length - prev;
+      this.setSelectionRange(pos + diff, pos + diff);
+    });
+  }
 }
