@@ -1417,6 +1417,22 @@ gap:12px;
 
 }
 
+.user-modal-actions .btn-primary {
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.user-modal-actions .btn-primary::after {
+  inset: 0;
+  filter: blur(12px);
+}
+
+.user-modal-actions .btn-danger {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .btn-user{
 
 padding:12px 18px;
