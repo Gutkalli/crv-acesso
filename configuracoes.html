@@ -770,6 +770,33 @@
   </div>
 </div>
 
+<!-- Modal de confirmação de atualização de configurações -->
+<div class="modal-overlay cfg-hidden" id="modal-confirmar-salvar">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px;">
+        <i class="ph ph-warning" style="color:var(--warning);font-size:1.3rem;"></i>
+        Configurações já cadastradas
+      </h3>
+    </div>
+    <p style="margin-top:16px;font-size:0.88rem;color:var(--text-muted);line-height:1.7;">
+      Já existe uma configuração salva para este sistema.<br>
+      O que deseja fazer?
+    </p>
+    <div class="modal-footer" style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" id="btn-confirmar-cancelar">
+        <i class="ph ph-x"></i> Cancelar
+      </button>
+      <button class="btn btn-ghost" id="btn-confirmar-excluir" style="color:var(--danger);border-color:var(--danger);">
+        <i class="ph ph-trash"></i> Excluir tudo
+      </button>
+      <button class="btn btn-primary" id="btn-confirmar-atualizar">
+        <i class="ph ph-pencil-simple"></i> Atualizar
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- 1. Lib CDN do Supabase — DEVE vir primeiro -->
 <script src="static/js/vendor/supabase.min.js"></script>
 

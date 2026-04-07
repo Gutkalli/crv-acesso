@@ -640,7 +640,48 @@ function initAvancado() {
    ===================================================== */
 
 function initAcoesCabecalho() {
-  document.getElementById('btn-cfg-salvar')?.addEventListener('click', salvarConfiguracoes);
+
+  // Botão salvar — verifica se já existe dado salvo e exibe confirmação
+  document.getElementById('btn-cfg-salvar')?.addEventListener('click', async () => {
+    const supabase = getSupabaseInstance();
+    if (!supabase) { salvarConfiguracoes(); return; }
+
+    const { data } = await supabase
+      .from('configuracoes')
+      .select('chave')
+      .limit(1);
+
+    const jaExiste = data && data.length > 0;
+
+    if (jaExiste) {
+      // Mostra modal de confirmação
+      document.getElementById('modal-confirmar-salvar').classList.remove('cfg-hidden');
+    } else {
+      // Primeiro salvamento — vai direto
+      salvarConfiguracoes();
+    }
+  });
+
+  // Modal confirmação — botão Atualizar
+  document.getElementById('btn-confirmar-atualizar')?.addEventListener('click', () => {
+    document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
+    salvarConfiguracoes();
+  });
+
+  // Modal confirmação — botão Excluir tudo
+  document.getElementById('btn-confirmar-excluir')?.addEventListener('click', async () => {
+    document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
+    const supabase = getSupabaseInstance();
+    if (!supabase) return;
+    await supabase.from('configuracoes').delete().neq('chave', '');
+    mostrarToast('Configurações excluídas. Salvando valores atuais...', 'info');
+    setTimeout(() => salvarConfiguracoes(), 600);
+  });
+
+  // Modal confirmação — botão Cancelar
+  document.getElementById('btn-confirmar-cancelar')?.addEventListener('click', () => {
+    document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
+  });
 
   document.getElementById('btn-cfg-restaurar')?.addEventListener('click', () => {
     const ok = confirm('Deseja restaurar todas as configurações para os valores padrão?');
