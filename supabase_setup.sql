@@ -156,28 +156,14 @@ CREATE TABLE IF NOT EXISTS public.auditoria (
 
 -- ============================================================
 -- 10. TABELA: configuracoes
--- Configurações globais do sistema por empresa
+-- Store chave/valor — cada linha = um grupo de configuração
+-- valor é JSONB; ex: chave='empresa', valor={"nome":"CRV",...}
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.configuracoes (
-    id                   UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    empresa_id           UUID UNIQUE,
-    empresa_nome         TEXT,
-    empresa_cnpj         TEXT,
-    smtp_host            TEXT,
-    smtp_porta           INTEGER DEFAULT 587,
-    smtp_usuario         TEXT,
-    smtp_ssl             BOOLEAN DEFAULT TRUE,
-    notif_email          BOOLEAN DEFAULT TRUE,
-    notif_whatsapp       BOOLEAN DEFAULT FALSE,
-    notif_sistema        BOOLEAN DEFAULT TRUE,
-    backup_automatico    BOOLEAN DEFAULT TRUE,
-    backup_intervalo     TEXT DEFAULT 'diario',
-    tentativas_bloqueio  INTEGER DEFAULT 5,
-    tempo_sessao         INTEGER DEFAULT 480,
-    logo_url             TEXT,
-    tema                 TEXT DEFAULT 'dark',
-    created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    chave      TEXT UNIQUE NOT NULL,
+    valor      JSONB NOT NULL DEFAULT '{}',
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 
