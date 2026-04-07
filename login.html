@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — CRV Controle de Acesso</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/login.css">
+</head>
+<body class="login-body">
+
+  <div class="login-bg"></div>
+  <div class="login-overlay"></div>
+
+  <div class="login-wrapper">
+
+    <div class="login-card">
+
+      <!-- Logo + Título -->
+      <div class="login-brand">
+        <img src="static/img/logo1.png" alt="CRV" class="login-brand-logo">
+        <div class="login-brand-info">
+          <span class="login-brand-title">CRV Controle de Acesso</span>
+          <span class="login-brand-sub">Sistema Corporativo de Acesso</span>
+        </div>
+      </div>
+
+      <div class="login-divider"></div>
+
+      <div class="login-options">
+        <label class="login-remember">
+          <input type="checkbox" id="lembrar-me"> Lembrar acesso
+        </label>
+        <a data-href="recuperacao_senha" class="login-forgot">Esqueci minha senha</a>
+      </div>
+
+      <form id="loginForm">
+
+  <div class="form-group">
+    <label class="form-label">E-mail</label>
+    <div class="input-icon-wrap">
+      <i class="ph ph-envelope input-icon"></i>
+      <input id="email" type="email" class="form-control" placeholder="seu@email.com">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Senha</label>
+    <div class="input-icon-wrap">
+      <i class="ph ph-lock input-icon"></i>
+      <input id="senha" type="password" class="form-control input-pass" placeholder="••••••••">
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary btn-login">
+    <i class="ph ph-sign-in"></i> Entrar
+  </button>
+
+</form>
+
+      <div class="login-footer-links">
+        <a data-href="recuperacao_senha"><i class="ph ph-lock-key"></i> Recuperar senha</a>
+        <span>·</span>
+        <a href="#"><i class="ph ph-headset"></i> Suporte</a>
+      </div>
+
+    </div>
+
+    <!-- Rodapé fora do card -->
+    <div class="login-page-footer">
+      <i class="ph ph-shield-check"></i>
+      <span>Acesso seguro e criptografado · CRV Soluções em TI</span>
+    </div>
+
+  </div>
+
+  <button class="btn-tema" id="theme-toggle" title="Alternar tema">
+    <i class="ph ph-moon" id="theme-icon"></i>
+  </button>
+
+  <script src="static/js/login.js"></script>
+  <script src="static/js/auth.js"></script>
+</body>
+</html>

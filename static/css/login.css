@@ -1,0 +1,373 @@
+/* ============================================================
+   LOGIN — login.css
+   Card centralizado, background foto, efeito neon/brilho
+   ============================================================ */
+
+.login-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background foto */
+.login-bg {
+  position: fixed;
+  inset: 0;
+  background: url('../img/imgfundo.png') center center / cover no-repeat;
+  z-index: 0;
+  transform: scale(1.04);
+  filter: blur(.5px);
+  transition: filter 0.4s ease;
+}
+
+/* Overlay escuro sobre o fundo */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 18, 0.30);
+  z-index: 1;
+}
+
+[data-theme="light"] .login-overlay {
+  background: rgba(4, 8, 18, 0.45);
+}
+
+/* Wrapper geral */
+.login-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Card */
+.login-card {
+  width: 100%;
+  background: rgba(13, 21, 32, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(0, 145, 173, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  box-shadow:
+    0 0 0 1px rgba(0, 145, 173, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    0 0 60px rgba(0, 145, 173, 0.08);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.login-card:hover {
+  border-color: rgba(0, 145, 173, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(0, 145, 173, 0.2),
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(0, 145, 173, 0.18),
+    0 0 120px rgba(0, 145, 173, 0.08);
+}
+
+[data-theme="light"] .login-card {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 145, 173, 0.2);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.18),
+    0 0 60px rgba(0, 145, 173, 0.06);
+}
+
+[data-theme="light"] .login-card:hover {
+  border-color: rgba(0, 145, 173, 0.45);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.2),
+    0 0 80px rgba(0, 145, 173, 0.12);
+}
+
+/* Brand / Logo */
+.login-brand{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:10px;
+}
+
+.login-brand-logo {
+  height: 260px;
+  width: 260px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(0, 145, 173, 0.5));
+  transition: filter 0.3s ease;
+}
+
+.login-card:hover .login-brand-logo {
+  filter: drop-shadow(0 0 16px rgba(0, 145, 173, 0.8));
+}
+
+.login-brand-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.login-brand-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+[data-theme="light"] .login-brand-title {
+  color: var(--text-primary);
+}
+
+.login-brand-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.04em;
+}
+
+[data-theme="light"] .login-brand-sub {
+  color: var(--text-muted);
+}
+
+/* Divider */
+.login-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(0, 145, 173, 0.4),
+    transparent
+  );
+  margin-bottom: 24px;
+}
+
+/* Inputs adaptados ao fundo escuro */
+.login-card .form-control {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(0, 145, 173, 0.2);
+  color: #ffffff;
+}
+
+.login-card .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.login-card .form-control:focus {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 145, 173, 0.2),
+              0 0 16px rgba(0, 145, 173, 0.15);
+}
+
+[data-theme="light"] .login-card .form-control {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .login-card .form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.login-card .form-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="light"] .login-card .form-label {
+  color: var(--text-secondary);
+}
+
+/* Input com ícone */
+.input-icon-wrap {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+[data-theme="light"] .input-icon {
+  color: var(--text-muted);
+}
+
+.input-icon-wrap .form-control {
+  padding-left: 38px;
+}
+
+.input-pass {
+  padding-right: 40px !important;
+}
+
+.btn-toggle-pass {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color var(--transition);
+}
+
+.btn-toggle-pass:hover {
+  color: var(--primary);
+}
+
+/* Opções */
+.login-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0 22px;
+}
+
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+}
+
+[data-theme="light"] .login-remember {
+  color: var(--text-secondary);
+}
+
+.login-remember input {
+  accent-color: var(--primary);
+}
+
+.login-forgot {
+  font-size: 0.8rem;
+  color: var(--primary);
+  transition: color var(--transition);
+}
+
+.login-forgot:hover {
+  color: #22d3ee;
+}
+
+/* Botão entrar */
+.btn-login {
+  width: 100%;
+  justify-content: center;
+  padding: 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 20px rgba(0, 145, 173, 0.35);
+  transition: box-shadow 0.3s ease, background 0.2s ease;
+}
+
+.btn-login:hover {
+  box-shadow: 0 4px 30px rgba(0, 145, 173, 0.6),
+              0 0 40px rgba(0, 145, 173, 0.2);
+}
+
+/* Links rodapé do card */
+.login-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-size: 0.78rem;
+}
+
+.login-footer-links a {
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color var(--transition);
+}
+
+.login-footer-links a:hover {
+  color: var(--primary);
+}
+
+.login-footer-links span {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .login-footer-links a {
+  color: var(--text-muted);
+}
+
+/* Rodapé fora do card */
+.login-page-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.login-page-footer .ph {
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+[data-theme="light"] .login-page-footer {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Botão de tema */
+.btn-tema {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: rgba(13, 21, 32, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 145, 173, 0.25);
+  border-radius: var(--radius-sm);
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  z-index: 10;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.btn-tema:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+
+  .login-brand-title {
+    font-size: 1rem;
+  }
+}

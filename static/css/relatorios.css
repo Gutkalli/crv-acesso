@@ -1,0 +1,453 @@
+/* =====================================================
+   CRV CONTROLE DE ACESSO
+   TELA: RELATÓRIOS
+   ===================================================== */
+
+
+/* =====================================================
+   UTILITÁRIOS LOCAIS
+   ===================================================== */
+
+.rel-hidden {
+  display: none !important;
+}
+
+
+/* =====================================================
+   LAYOUT PRINCIPAL — GRID
+   ===================================================== */
+
+.rel-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.rel-col-tipos {
+  position: sticky;
+  top: 20px;
+}
+
+.rel-col-config {
+  min-width: 0;
+}
+
+
+/* =====================================================
+   LISTA DE TIPOS DE RELATÓRIO
+   ===================================================== */
+
+.rel-tipos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.rel-tipo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  border: 1px solid transparent;
+}
+
+.rel-tipo-item:hover {
+  background: var(--surface-2);
+}
+
+.rel-tipo-item.active {
+  background: var(--primary-light);
+  border-color: rgba(0, 145, 173, 0.2);
+}
+
+.rel-tipo-item.active .rel-tipo-nome {
+  color: var(--primary);
+}
+
+.rel-tipo-item.active .rel-tipo-icon {
+  background: rgba(0, 145, 173, 0.15);
+  color: var(--primary);
+}
+
+.rel-tipo-item.active .rel-tipo-seta {
+  color: var(--primary);
+  opacity: 1;
+}
+
+.rel-tipo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition);
+}
+
+.rel-tipo-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rel-tipo-nome {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color var(--transition);
+}
+
+.rel-tipo-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.rel-tipo-seta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+  transition: color var(--transition), opacity var(--transition);
+}
+
+
+/* =====================================================
+   BADGE DO TIPO ATIVO
+   ===================================================== */
+
+.rel-tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid rgba(0, 145, 173, 0.2);
+}
+
+
+/* =====================================================
+   CONFIGURAÇÃO DO RELATÓRIO
+   ===================================================== */
+
+.rel-config-body {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rel-config-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.rel-datas-custom {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 4px;
+}
+
+.rel-config-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+
+/* =====================================================
+   PRÉ-VISUALIZAÇÃO
+   ===================================================== */
+
+.rel-previa-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  gap: 10px;
+}
+
+.rel-previa-empty i {
+  font-size: 46px;
+  opacity: 0.15;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.rel-previa-empty h3 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.rel-previa-empty p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  line-height: 1.7;
+}
+
+.rel-previa-content {
+  padding: 0;
+}
+
+.rel-previa-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.rel-previa-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rel-previa-logo i {
+  font-size: 1.3rem;
+}
+
+.rel-previa-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.rel-previa-meta strong {
+  color: var(--text-primary);
+}
+
+.rel-previa-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rel-previa-rodape strong {
+  color: var(--text-primary);
+}
+
+
+/* =====================================================
+   BADGE DE FORMATO
+   ===================================================== */
+
+.rel-formato-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rel-formato-badge.pdf {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.rel-formato-badge.xlsx {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.rel-formato-badge.csv {
+  background: rgba(0, 145, 173, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(0, 145, 173, 0.2);
+}
+
+
+/* =====================================================
+   HISTÓRICO DE RELATÓRIOS — ESTADO VAZIO
+   ===================================================== */
+
+.rel-historico-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 24px;
+  gap: 10px;
+}
+
+.rel-historico-empty i {
+  font-size: 40px;
+  opacity: 0.15;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.rel-historico-empty h3 {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.rel-historico-empty p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 360px;
+  line-height: 1.7;
+}
+
+
+/* =====================================================
+   BADGE DE STATUS DA PRÉVIA (loading)
+   ===================================================== */
+
+.rel-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 24px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+@keyframes rel-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.rel-loading i {
+  font-size: 1.4rem;
+  animation: rel-spin 0.8s linear infinite;
+  color: var(--primary);
+}
+
+
+/* =====================================================
+   KPIs — GRID LOCAL
+   ===================================================== */
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.page-title {
+  margin: 0;
+}
+
+.page-header p {
+  margin-top: 6px;
+}
+
+.kpi-grid {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
+
+@media (max-width: 1024px) {
+  .rel-grid {
+    grid-template-columns: 260px 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .rel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rel-col-tipos {
+    position: static;
+  }
+
+  .rel-tipos-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .rel-config-row {
+    grid-template-columns: 1fr;
+  }
+
+  .rel-tipos-list {
+    grid-template-columns: 1fr;
+  }
+
+  .rel-config-acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rel-config-acoes .btn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .rel-previa-header {
+    flex-direction: column;
+  }
+
+  .rel-previa-meta {
+    justify-content: flex-start;
+  }
+}

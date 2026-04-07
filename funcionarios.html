@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funcionários — CRV Controle de Acesso</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/funcionarios.css">
+  <script src="static/js/vendor/supabase.min.js"></script>
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<!-- Cabeçalho -->
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Funcionários</h2>
+    <p class="text-sm text-muted mt-1">Cadastro e gestão de colaboradores</p>
+    <p class="text-sm text-muted mt-1">
+      Gerencie o cadastro, permissões e status de acesso de todos os colaboradores.
+    </p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-ghost btn-sm" id="btn-importar">
+      <i class="ph ph-upload-simple"></i> Importar
+    </button>
+    <button class="btn btn-ghost btn-sm" id="btn-exportar">
+      <i class="ph ph-download-simple"></i> Exportar
+    </button>
+    <button class="btn btn-primary btn-sm" id="btn-novo">
+      <i class="ph ph-plus"></i> Novo Funcionário
+    </button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px;">
+
+  <div class="kpi-card" style="border-top:3px solid var(--primary);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Total</span>
+      <i class="ph ph-users kpi-icon" style="color:var(--primary);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-total">0</div>
+    <div class="kpi-sub">funcionários cadastrados</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--success);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Ativos</span>
+      <i class="ph ph-check-circle kpi-icon" style="color:var(--success);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-ativos">0</div>
+    <div class="kpi-sub">com acesso liberado</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--danger);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Inativos</span>
+      <i class="ph ph-x-circle kpi-icon" style="color:var(--danger);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-inativos">0</div>
+    <div class="kpi-sub">acesso bloqueado</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--warning);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Sem biometria</span>
+      <i class="ph ph-fingerprint kpi-icon" style="color:var(--warning);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-biometria">0</div>
+    <div class="kpi-sub">pendentes de cadastro</div>
+  </div>
+
+</div>
+
+    <!-- Filtros e busca -->
+    <div class="card mb-4">
+      <div class="func-filtros">
+        <div class="input-icon-wrap func-busca">
+          <i class="ph ph-magnifying-glass input-icon"></i>
+          <input type="text" class="form-control" id="input-busca" placeholder="Buscar por nome, matrícula ou setor...">
+        </div>
+        <select class="form-control func-select" id="filtro-setor">
+          <option value="">Todos os setores</option>
+          <option>Operações</option>
+          <option>Administrativo</option>
+          <option>TI</option>
+          <option>RH</option>
+          <option>Financeiro</option>
+          <option>Segurança</option>
+        </select>
+        <select class="form-control func-select" id="filtro-status">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+          <option value="pendente">Pendente</option>
+        </select>
+        <select class="form-control func-select" id="filtro-turno">
+          <option value="">Todos os turnos</option>
+          <option>Manhã</option>
+          <option>Tarde</option>
+          <option>Noite</option>
+          <option>Integral</option>
+        </select>
+        <div class="func-view-toggle">
+          <button class="btn btn-ghost btn-sm btn-icon func-view-btn active" id="btn-view-tabela" title="Tabela">
+            <i class="ph ph-list"></i>
+          </button>
+          <button class="btn btn-ghost btn-sm btn-icon func-view-btn" id="btn-view-cards" title="Cards">
+            <i class="ph ph-squares-four"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela / Estado vazio -->
+    <div class="card" id="view-tabela">
+      <div class="card-header">
+        <span class="card-title"><i class="ph ph-table"></i> Lista de Funcionários</span>
+        <span class="text-sm text-muted" id="total-label">0 registros</span>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="func-empty" id="func-empty">
+        <i class="ph ph-users"></i>
+        <h3>Nenhum funcionário cadastrado</h3>
+        <p>Clique em <strong>Novo Funcionário</strong> para começar ou importe uma planilha.</p>
+        <div class="flex gap-2 justify-center mt-4">
+          <button class="btn btn-primary" id="btn-novo-empty">
+            <i class="ph ph-plus"></i> Novo Funcionário
+          </button>
+          <button class="btn btn-ghost" id="btn-importar-empty">
+            <i class="ph ph-upload-simple"></i> Importar planilha
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabela (oculta até ter dados) -->
+      <div class="table-wrapper func-table-hidden" id="func-table-wrap">
+        <table id="func-table">
+          <thead>
+            <tr>
+              <th style="width:40px;"><input type="checkbox" id="check-all"></th>
+              <th>Funcionário</th>
+              <th>Matrícula</th>
+              <th>Setor</th>
+              <th>Turno</th>
+              <th>Biometria</th>
+              <th>Status</th>
+              <th style="width:120px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="func-tbody">
+            <!-- Linhas injetadas via JS/backend -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- View Cards (oculta por padrão) -->
+    <div class="func-cards-grid func-table-hidden" id="view-cards">
+      <!-- Cards injetados via JS -->
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal: Novo / Editar Funcionário -->
+<div class="modal-overlay func-table-hidden" id="modal-funcionario">
+  <div class="func-modal">
+
+    <!-- Botão fechar -->
+    <button class="func-modal-close" id="modal-fechar">
+      <i class="ph ph-x"></i>
+    </button>
+
+    <!-- Título -->
+    <div class="func-modal-title">
+      <i class="ph ph-user-plus"></i>
+      <span id="modal-titulo">Novo Funcionário</span>
+    </div>
+
+    <!-- Avatar / Foto -->
+    <div class="func-modal-avatar-wrap">
+      <div class="func-modal-avatar" id="modal-avatar-preview">
+        <i class="ph ph-user"></i>
+      </div>
+      <div class="flex flex-col gap-1">
+        <input type="file" id="input-foto" accept="image/png, image/jpeg" style="display:none">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="document.getElementById('input-foto').click()">
+          <i class="ph ph-camera"></i> Foto
+        </button>
+        <span class="text-xs text-muted">JPG ou PNG máx 2MB</span>
+      </div>
+    </div>
+
+    <!-- Dados Pessoais -->
+    <div class="modal-section-title">Dados Pessoais</div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Nome completo <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="f-nome" placeholder="Nome do funcionário" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CPF <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="f-cpf" placeholder="000.000.000-00" maxlength="14" required>
+      </div>
+    </div>
+
+    <!-- Dados Corporativos -->
+    <div class="modal-section-title">Dados Corporativos</div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label"><i class="ph ph-building"></i> Empresa <span class="form-required">*</span></label>
+        <select class="form-control" id="f-emp_id" required>
+          <option value="">Selecione a empresa...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><i class="ph ph-hashtag"></i> Matrícula <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="f-matricula" placeholder="MAT20261234" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><i class="ph ph-briefcase"></i> Cargo <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="f-cargo" placeholder="Ex: Analista de TI" required>
+      </div>
+      <div class="form-group checkbox-group">
+        <label class="form-label"><i class="ph ph-toggle-right"></i> Ativo</label>
+        <input type="checkbox" id="f-ativo" checked>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar">
+        <i class="ph ph-floppy-disk"></i> Salvar Funcionário
+      </button>
+    </div>
+
+  </div><!-- fecha .func-modal -->
+</div><!-- fecha .modal-overlay -->
+
+<!-- Modal: Importar Planilha -->
+<div class="modal-overlay func-table-hidden" id="modal-importar">
+  <div class="func-modal" style="max-width:600px;">
+
+    <button class="func-modal-close" id="modal-import-fechar">
+      <i class="ph ph-x"></i>
+    </button>
+
+    <div class="func-modal-title">
+      <i class="ph ph-file-arrow-up"></i>
+      <span>Importar Planilha</span>
+    </div>
+
+    <!-- Instruções -->
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;">
+        <i class="ph ph-info" style="color:var(--primary);"></i>
+        O arquivo CSV deve ter as seguintes colunas na ordem abaixo, separadas por <strong>ponto e vírgula (;)</strong>:
+      </p>
+      <code style="font-size:0.78rem;color:var(--primary);display:block;padding:6px 10px;background:var(--surface);border-radius:4px;">
+        Nome ; CPF ; Matrícula ; Cargo ; Status
+      </code>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-top:8px;">
+        A primeira linha deve ser o cabeçalho. Status aceito: <strong>ativo</strong> ou <strong>inativo</strong>.
+      </p>
+    </div>
+
+    <!-- Download modelo -->
+    <button class="btn btn-ghost btn-sm" id="btn-baixar-modelo" style="margin-bottom:16px;">
+      <i class="ph ph-download-simple"></i> Baixar modelo CSV
+    </button>
+
+    <!-- Zona de drop -->
+    <div id="import-dropzone" style="
+      border:2px dashed var(--border);
+      border-radius:10px;
+      padding:32px 20px;
+      text-align:center;
+      cursor:pointer;
+      transition:border-color 0.2s,background 0.2s;
+      margin-bottom:16px;
+    ">
+      <i class="ph ph-upload-simple" style="font-size:2rem;color:var(--text-muted);display:block;margin-bottom:8px;"></i>
+      <p style="font-size:0.88rem;color:var(--text-muted);margin:0;">
+        Arraste o arquivo CSV aqui ou <span style="color:var(--primary);font-weight:600;cursor:pointer;" id="import-click-label">clique para selecionar</span>
+      </p>
+      <p id="import-arquivo-nome" style="font-size:0.82rem;color:var(--primary);margin-top:8px;font-weight:500;display:none;"></p>
+      <input type="file" id="input-csv" accept=".csv" style="display:none;">
+    </div>
+
+    <!-- Preview tabela -->
+    <div id="import-preview-wrap" style="display:none;margin-bottom:16px;">
+      <div style="font-size:0.82rem;font-weight:600;color:var(--text-primary);margin-bottom:8px;">
+        <i class="ph ph-eye"></i> Pré-visualização (<span id="import-total-linhas">0</span> registros encontrados)
+      </div>
+      <div style="overflow-x:auto;border:1px solid var(--border);border-radius:8px;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+          <thead id="import-preview-thead" style="background:var(--bg);"></thead>
+          <tbody id="import-preview-tbody"></tbody>
+        </table>
+      </div>
+      <p id="import-aviso-max" style="font-size:0.76rem;color:var(--text-muted);margin-top:6px;display:none;">
+        Mostrando apenas as primeiras 5 linhas.
+      </p>
+    </div>
+
+    <!-- Progresso -->
+    <div id="import-progresso-wrap" style="display:none;margin-bottom:16px;">
+      <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:6px;" id="import-progresso-label">Importando...</div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div id="import-progresso-bar" style="height:100%;background:var(--primary);width:0%;transition:width 0.3s;border-radius:3px;"></div>
+      </div>
+    </div>
+
+    <!-- Resultado -->
+    <div id="import-resultado" style="display:none;padding:12px 16px;border-radius:8px;font-size:0.85rem;margin-bottom:16px;"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-import-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-import-confirmar" disabled>
+        <i class="ph ph-file-arrow-up"></i> Importar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/api.js"></script>
+<script src="static/js/core/db.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/core/sync.js"></script>
+<script src="static/js/core/session.js"></script>
+
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/funcionarios.js"></script>
+
+</body>
+</html>

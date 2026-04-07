@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Senha — CRV Controle de Acesso</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/login.css">
+  <link rel="stylesheet" href="static/css/recuperacao_senha.css">
+</head>
+<body class="login-body">
+
+  <div class="login-bg"></div>
+  <div class="login-overlay"></div>
+
+  <div class="login-wrapper">
+
+    <div class="login-card">
+
+      <!-- Logo + Título -->
+      <div class="login-brand">
+        <img src="static/img/logo-crv.png" alt="CRV" class="login-brand-logo">
+        <div class="login-brand-info">
+          <span class="login-brand-title">CRV Controle de Acesso</span>
+          <span class="login-brand-sub">Recuperação de senha</span>
+        </div>
+      </div>
+
+      <div class="login-divider"></div>
+
+      <!-- Etapa 1 — E-mail -->
+      <div id="etapa-email">
+        <div class="rec-icon-wrap">
+          <i class="ph ph-lock-key-open rec-icon"></i>
+        </div>
+        <p class="rec-desc">
+          Informe seu e-mail corporativo. Enviaremos um código de verificação para redefinir sua senha.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">E-mail corporativo</label>
+          <div class="input-icon-wrap">
+            <i class="ph ph-envelope input-icon"></i>
+            <input type="email" class="form-control" id="email-input" placeholder="seu@email.com">
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-login">
+          <i class="ph ph-paper-plane-tilt"></i> Enviar código
+        </button>
+      </div>
+
+      <!-- Etapa 2 — Código (oculta inicialmente) -->
+      <div id="etapa-codigo" class="rec-hidden">
+        <div class="rec-icon-wrap">
+          <i class="ph ph-shield-check rec-icon" style="color:var(--primary);"></i>
+        </div>
+        <p class="rec-desc">
+          Código enviado para <strong id="email-destino" class="rec-email"></strong>. Verifique sua caixa de entrada.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Código de verificação</label>
+          <div class="rec-codigo-wrap">
+            <input type="text" class="form-control rec-codigo-input" maxlength="1" id="c1">
+            <input type="text" class="form-control rec-codigo-input" maxlength="1" id="c2">
+            <input type="text" class="form-control rec-codigo-input" maxlength="1" id="c3">
+            <input type="text" class="form-control rec-codigo-input" maxlength="1" id="c4">
+            <input type="text" class="form-control rec-codigo-input" maxlength="1" id="c5">
+            <input type="text" class="form-control rec-codigo-input" maxlength="1" id="c6">
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-login" id="btn-verificar">
+          <i class="ph ph-check-circle"></i> Verificar código
+        </button>
+
+        <button class="btn-reenviar" id="btn-reenviar">
+          <i class="ph ph-arrow-clockwise"></i>
+          <span id="reenviar-txt">Reenviar código</span>
+        </button>
+      </div>
+
+      <!-- Etapa 3 — Nova senha (oculta inicialmente) -->
+      <div id="etapa-nova-senha" class="rec-hidden">
+        <div class="rec-icon-wrap">
+          <i class="ph ph-lock rec-icon" style="color:var(--success);"></i>
+        </div>
+        <p class="rec-desc">Defina sua nova senha. Use no mínimo 8 caracteres com letras e números.</p>
+
+        <div class="form-group">
+          <label class="form-label">Nova senha</label>
+          <div class="input-icon-wrap">
+            <i class="ph ph-lock input-icon"></i>
+            <input type="password" class="form-control input-pass" id="nova-senha" placeholder="••••••••">
+            <button class="btn-toggle-pass" id="toggle-nova" type="button">
+              <i class="ph ph-eye" id="olho-nova"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirmar senha</label>
+          <div class="input-icon-wrap">
+            <i class="ph ph-lock input-icon"></i>
+            <input type="password" class="form-control input-pass" id="conf-senha" placeholder="••••••••">
+            <button class="btn-toggle-pass" id="toggle-conf" type="button">
+              <i class="ph ph-eye" id="olho-conf"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Força da senha -->
+        <div class="rec-forca-wrap">
+          <div class="rec-forca-bar">
+            <div class="rec-forca-fill" id="forca-fill"></div>
+          </div>
+          <span class="rec-forca-label" id="forca-label">—</span>
+        </div>
+
+        <button class="btn btn-primary btn-login" id="btn-redefinir">
+          <i class="ph ph-floppy-disk"></i> Redefinir senha
+        </button>
+      </div>
+
+      <!-- Etapa 4 — Sucesso (oculta inicialmente) -->
+      <div id="etapa-sucesso" class="rec-hidden rec-sucesso">
+        <i class="ph ph-check-circle rec-sucesso-icon"></i>
+        <h3 class="rec-sucesso-title">Senha redefinida!</h3>
+        <p class="rec-desc">Sua senha foi alterada com sucesso. Você já pode acessar o sistema.</p>
+        <button class="btn btn-primary btn-login" onclick="window.location.href='login.html'">
+          <i class="ph ph-sign-in"></i> Ir para o login
+        </button>
+      </div>
+
+      <!-- Indicador de etapas -->
+      <div class="rec-steps">
+        <div class="rec-step active" id="step-1"></div>
+        <div class="rec-step" id="step-2"></div>
+        <div class="rec-step" id="step-3"></div>
+        <div class="rec-step" id="step-4"></div>
+      </div>
+
+      <div class="login-footer-links">
+        <a data-href="login"><i class="ph ph-arrow-left"></i> Voltar ao login</a>
+      </div>
+
+    </div>
+
+    <div class="login-page-footer">
+      <i class="ph ph-shield-check"></i>
+      <span>Acesso seguro e criptografado · CRV Soluções em TI</span>
+    </div>
+
+  </div>
+
+  <button class="btn-tema" id="theme-toggle" title="Alternar tema">
+    <i class="ph ph-moon" id="theme-icon"></i>
+  </button>
+
+  <script src="static/js/login.js"></script>
+  <script src="static/js/recuperacao_senha.js"></script>
+</body>
+</html>

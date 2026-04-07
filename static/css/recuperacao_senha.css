@@ -1,0 +1,172 @@
+/* ============================================================
+   RECUPERAÇÃO DE SENHA — recuperacao_senha.css
+   ============================================================ */
+
+.rec-hidden {
+  display: none;
+}
+
+/* Ícone central */
+.rec-icon-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.rec-icon {
+  font-size: 2.8rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Descrição */
+.rec-desc {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+[data-theme="light"] .rec-desc {
+  color: var(--text-muted);
+}
+
+.rec-email {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Inputs de código — 6 boxes */
+.rec-codigo-wrap {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.rec-codigo-input {
+  width: 44px !important;
+  height: 52px;
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 0 !important;
+  letter-spacing: 0;
+}
+
+.rec-codigo-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 145, 173, 0.25),
+              0 0 16px rgba(0, 145, 173, 0.2);
+}
+
+/* Reenviar */
+.btn-reenviar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: color var(--transition);
+  padding: 6px;
+}
+
+.btn-reenviar:hover {
+  color: var(--primary);
+}
+
+[data-theme="light"] .btn-reenviar {
+  color: var(--text-muted);
+}
+
+/* Força da senha */
+.rec-forca-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -8px 0 18px;
+}
+
+.rec-forca-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+[data-theme="light"] .rec-forca-bar {
+  background: var(--surface-2);
+}
+
+.rec-forca-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.rec-forca-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  min-width: 48px;
+  text-align: right;
+}
+
+/* Indicador de etapas */
+.rec-steps {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.rec-step {
+  width: 24px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.3s ease, width 0.3s ease;
+}
+
+.rec-step.active {
+  background: var(--primary);
+  width: 36px;
+  box-shadow: 0 0 8px rgba(0, 145, 173, 0.6);
+}
+
+[data-theme="light"] .rec-step {
+  background: var(--border);
+}
+
+/* Sucesso */
+.rec-sucesso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.rec-sucesso-icon {
+  font-size: 4rem;
+  color: var(--success);
+  filter: drop-shadow(0 0 16px rgba(34, 197, 94, 0.5));
+}
+
+.rec-sucesso-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.4rem;
+  color: #ffffff;
+}
+
+[data-theme="light"] .rec-sucesso-title {
+  color: var(--text-primary);
+}

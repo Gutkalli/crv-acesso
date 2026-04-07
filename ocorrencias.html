@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocorrências — CRV Controle de Acesso</title>
+  <script src="static/js/vendor/supabase.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/ocorrencias.css">
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Ocorrências</h2>
+    <p class="text-sm text-muted mt-1">Registro e acompanhamento de eventos críticos</p>
+    <p class="text-sm text-muted mt-1">
+      Registre, classifique e acompanhe a resolução de incidentes e eventos de segurança.
+    </p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-ghost btn-sm" id="btn-ocorr-exportar">
+      <i class="ph ph-download-simple"></i> Exportar
+    </button>
+    <button class="btn btn-primary btn-sm" id="btn-nova-ocorr">
+      <i class="ph ph-plus"></i> Nova Ocorrência
+    </button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+
+  <div class="kpi-card" style="border-top:3px solid var(--info);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Abertas</span>
+      <i class="ph ph-warning-circle kpi-icon" style="color:var(--info);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">aguardando ação</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--warning);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Em análise</span>
+      <i class="ph ph-magnifying-glass kpi-icon" style="color:var(--warning);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">sendo investigadas</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--success);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Resolvidas hoje</span>
+      <i class="ph ph-check-circle kpi-icon" style="color:var(--success);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">encerradas no dia</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--danger);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Críticas</span>
+      <i class="ph ph-fire kpi-icon" style="color:var(--danger);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">prioridade máxima</div>
+  </div>
+
+</div>
+
+    <!-- Abas -->
+    <div class="ocorr-tabs">
+      <button class="ocorr-tab active" data-tab="todas">
+        <i class="ph ph-list"></i> Todas
+      </button>
+      <button class="ocorr-tab" data-tab="abertas">
+        <i class="ph ph-warning-circle"></i> Abertas
+      </button>
+      <button class="ocorr-tab" data-tab="analise">
+        <i class="ph ph-magnifying-glass"></i> Em análise
+      </button>
+      <button class="ocorr-tab" data-tab="resolvidas">
+        <i class="ph ph-check-circle"></i> Resolvidas
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+      <div class="ocorr-filtros">
+        <div class="ocorr-busca input-icon-wrap">
+          <i class="ph ph-magnifying-glass input-icon"></i>
+          <input type="text" class="form-control" id="busca-ocorr" placeholder="Buscar por funcionário, área ou descrição...">
+        </div>
+        <select class="form-control ocorr-select" id="filtro-tipo-ocorr">
+          <option value="">Todos os tipos</option>
+          <option>Acesso negado</option>
+          <option>Uso indevido</option>
+          <option>Equipamento offline</option>
+          <option>Saída fora do horário</option>
+          <option>Tentativa suspeita</option>
+          <option>Outro</option>
+        </select>
+        <select class="form-control ocorr-select" id="filtro-prioridade-ocorr">
+          <option value="">Todas as prioridades</option>
+          <option>Crítica</option>
+          <option>Alta</option>
+          <option>Normal</option>
+          <option>Baixa</option>
+        </select>
+        <input type="date" class="form-control ocorr-date" id="filtro-data-ocorr">
+      </div>
+    </div>
+
+    <!-- Lista / Estado vazio -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="ph ph-warning-circle"></i> Lista de Ocorrências</span>
+        <span class="text-sm text-muted" id="ocorr-total-label">0 ocorrências</span>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="ocorr-empty" id="ocorr-empty">
+        <i class="ph ph-check-circle"></i>
+        <h3>Nenhuma ocorrência registrada</h3>
+        <p>Ocorrências são geradas automaticamente pelo sistema ou podem ser criadas manualmente pela equipe de segurança.</p>
+        <button class="btn btn-primary mt-4" id="btn-nova-ocorr-empty">
+          <i class="ph ph-plus"></i> Registrar Ocorrência
+        </button>
+      </div>
+
+      <!-- Lista (oculta até ter dados) -->
+      <div class="ocorr-list ocorr-hidden" id="ocorr-list">
+        <!-- itens injetados via backend -->
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ===================== MODAL: NOVA OCORRÊNCIA ===================== -->
+<div class="modal-overlay ocorr-hidden" id="modal-ocorr">
+  <div class="modal ocorr-modal">
+
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-ocorr-titulo">
+        <i class="ph ph-warning-circle"></i> Nova Ocorrência
+      </h3>
+      <button class="modal-close" id="modal-ocorr-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Tipo de ocorrência <span class="form-required">*</span></label>
+          <select class="form-control" id="o-tipo">
+            <option value="">Selecione...</option>
+            <option>Acesso negado</option>
+            <option>Uso indevido</option>
+            <option>Equipamento offline</option>
+            <option>Saída fora do horário</option>
+            <option>Tentativa suspeita</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prioridade <span class="form-required">*</span></label>
+          <select class="form-control" id="o-prioridade">
+            <option value="">Selecione...</option>
+            <option>Crítica</option>
+            <option>Alta</option>
+            <option>Normal</option>
+            <option>Baixa</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-section-title">Envolvidos</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Funcionário</label>
+          <div class="input-icon-wrap">
+            <i class="ph ph-user input-icon"></i>
+            <input type="text" class="form-control" id="o-funcionario" placeholder="Buscar funcionário...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Equipamento / Área</label>
+          <div class="input-icon-wrap">
+            <i class="ph ph-map-pin input-icon"></i>
+            <input type="text" class="form-control" id="o-local" placeholder="Ex: Portão Principal">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section-title">Detalhes</div>
+      <div class="form-group">
+        <label class="form-label">Descrição <span class="form-required">*</span></label>
+        <textarea class="form-control" id="o-descricao" rows="3"
+          placeholder="Descreva detalhadamente o que ocorreu..."></textarea>
+      </div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Data e hora</label>
+          <input type="datetime-local" class="form-control" id="o-data">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status inicial</label>
+          <select class="form-control" id="o-status">
+            <option value="aberta">Aberta</option>
+            <option value="analise">Em análise</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Responsável pela análise</label>
+        <div class="input-icon-wrap">
+          <i class="ph ph-user-gear input-icon"></i>
+          <input type="text" class="form-control" id="o-responsavel" placeholder="Atribuir a...">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Observações internas</label>
+        <textarea class="form-control" id="o-obs" rows="2"
+          placeholder="Notas internas visíveis apenas para a equipe..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-ocorr-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-ocorr-salvar">
+        <i class="ph ph-floppy-disk"></i> Registrar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== MODAL: DETALHE OCORRÊNCIA ===================== -->
+<div class="modal-overlay ocorr-hidden" id="modal-ocorr-detalhe">
+  <div class="modal ocorr-modal">
+
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="ph ph-clipboard-text"></i> Detalhe da Ocorrência
+      </h3>
+      <button class="modal-close" id="modal-detalhe-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" id="modal-detalhe-body">
+      <!-- conteúdo injetado via JS -->
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-detalhe-fechar">Fechar</button>
+      <button class="btn btn-ghost btn-sm" id="btn-detalhe-editar">
+        <i class="ph ph-pencil-simple"></i> Editar
+      </button>
+      <button class="btn btn-primary" id="btn-detalhe-resolver">
+        <i class="ph ph-check-circle"></i> Marcar como resolvida
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/core/session.js"></script>
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/ocorrencias.js"></script>
+
+</body>
+</html>

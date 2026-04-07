@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações — CRV Controle de Acesso</title>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/configuracoes.css">
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Configurações</h2>
+    <p class="text-sm text-muted mt-1">Preferências gerais do sistema</p>
+    <p class="text-sm text-muted mt-1">
+      Personalize o sistema, gerencie usuários, integrações, segurança e backup.
+    </p>
+  </div>
+      <div class="page-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-cfg-restaurar">
+          <i class="ph ph-arrow-counter-clockwise"></i> Restaurar padrões
+        </button>
+        <button class="btn btn-primary btn-sm" id="btn-cfg-salvar">
+          <i class="ph ph-floppy-disk"></i> Salvar alterações
+        </button>
+      </div>
+    </div>
+
+    <div class="cfg-layout">
+
+      <!-- Menu lateral -->
+      <nav class="card cfg-nav">
+        <div class="cfg-nav-list">
+
+          <button class="cfg-nav-item active" data-secao="geral">
+            <i class="ph ph-gear"></i>
+            <span>Geral</span>
+          </button>
+
+          <button class="cfg-nav-item" data-secao="aparencia">
+            <i class="ph ph-paint-brush"></i>
+            <span>Aparência</span>
+          </button>
+
+          <button class="cfg-nav-item" data-secao="seguranca">
+            <i class="ph ph-shield-check"></i>
+            <span>Segurança</span>
+          </button>
+
+          <button class="cfg-nav-item" data-secao="notificacoes">
+            <i class="ph ph-bell"></i>
+            <span>Notificações</span>
+          </button>
+
+          <button class="cfg-nav-item" data-secao="integracao">
+            <i class="ph ph-plugs-connected"></i>
+            <span>Integração</span>
+          </button>
+
+          <button class="cfg-nav-item" data-secao="usuarios">
+            <i class="ph ph-users-three"></i>
+            <span>Usuários do sistema</span>
+          </button>
+
+          <button class="cfg-nav-item" data-secao="backup">
+            <i class="ph ph-cloud-arrow-up"></i>
+            <span>Backup</span>
+          </button>
+
+          <div class="cfg-nav-divider"></div>
+
+          <button class="cfg-nav-item cfg-nav-item-danger" data-secao="avancado">
+            <i class="ph ph-warning-octagon"></i>
+            <span>Avançado</span>
+          </button>
+
+        </div>
+      </nav>
+
+      <!-- Conteúdo -->
+      <div class="cfg-conteudo">
+
+        <!-- ==================== GERAL ==================== -->
+        <section class="cfg-secao" id="secao-geral">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-gear"></i> Geral
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Informações da empresa</div>
+            <div class="cfg-form-grid">
+              <div class="form-group">
+                <label class="form-label">Nome da empresa</label>
+                <input type="text" class="form-control" id="cfg-empresa-nome"
+                  placeholder="Ex: CRV Soluções">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CNPJ</label>
+                <input type="text" class="form-control" id="cfg-empresa-cnpj"
+                  placeholder="00.000.000/0000-00">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Endereço</label>
+                <input type="text" class="form-control" id="cfg-empresa-endereco"
+                  placeholder="Rua, número, cidade — UF">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Telefone</label>
+                <input type="text" class="form-control" id="cfg-empresa-tel"
+                  placeholder="(00) 0000-0000">
+              </div>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Preferências regionais</div>
+            <div class="cfg-form-grid">
+              <div class="form-group">
+                <label class="form-label">Fuso horário</label>
+                <select class="form-control" id="cfg-fuso">
+                  <option value="America/Sao_Paulo">América/São Paulo (UTC-3)</option>
+                  <option value="America/Manaus">América/Manaus (UTC-4)</option>
+                  <option value="America/Fortaleza">América/Fortaleza (UTC-3)</option>
+                  <option value="America/Belem">América/Belém (UTC-3)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Formato de data</label>
+                <select class="form-control" id="cfg-data-fmt">
+                  <option value="dd/MM/yyyy">DD/MM/AAAA</option>
+                  <option value="MM/dd/yyyy">MM/DD/AAAA</option>
+                  <option value="yyyy-MM-dd">AAAA-MM-DD</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Idioma</label>
+                <select class="form-control" id="cfg-idioma">
+                  <option value="pt-BR">Português (Brasil)</option>
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Comportamento do sistema</div>
+            <div class="cfg-toggles">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Logout automático por inatividade</div>
+                  <div class="cfg-toggle-desc">Encerra a sessão após o tempo definido sem atividade</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-logout-auto" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Tempo de inatividade</div>
+                  <div class="cfg-toggle-desc">Minutos até o logout automático</div>
+                </div>
+                <select class="form-control" style="width:120px;" id="cfg-inatividade">
+                  <option value="15">15 min</option>
+                  <option value="30" selected>30 min</option>
+                  <option value="60">60 min</option>
+                  <option value="120">120 min</option>
+                </select>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Som de alerta em acessos negados</div>
+                  <div class="cfg-toggle-desc">Reproduz um sinal sonoro ao detectar acesso negado</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-som-alerta">
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== APARÊNCIA ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-aparencia">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-paint-brush"></i> Aparência
+          </div>
+
+          <!-- LOGO DA EMPRESA -->
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Logo da empresa</div>
+            <p class="text-sm text-muted mb-3">
+              O logo será exibido no cabeçalho do sistema.
+              Formatos aceitos: PNG, JPG, SVG. Tamanho máximo: 2MB.
+            </p>
+            <div class="cfg-logo-area">
+              <div class="cfg-logo-preview" id="cfg-logo-preview">
+                <img id="cfg-logo-img" src="" alt="Logo da empresa" style="display:none;">
+                <div id="cfg-logo-placeholder">
+                  <i class="ph ph-image-square"></i>
+                  <span>Nenhum logo enviado</span>
+                </div>
+              </div>
+              <div class="cfg-logo-acoes">
+                <label class="btn btn-primary btn-sm cfg-logo-label" for="cfg-logo-input">
+                  <i class="ph ph-upload-simple"></i> Enviar logo
+                </label>
+                <input type="file" id="cfg-logo-input" accept="image/png,image/jpeg,image/svg+xml" style="display:none;">
+                <button class="btn btn-ghost btn-sm" id="btn-remover-logo" style="display:none;">
+                  <i class="ph ph-trash"></i> Remover
+                </button>
+                <div class="cfg-logo-status" id="cfg-logo-status"></div>
+              </div>
+            </div>
+            <div class="cfg-logo-dica text-sm text-muted mt-2">
+              <i class="ph ph-info"></i>
+              Recomendado: imagem com fundo transparente (PNG/SVG), altura mínima de 40px.
+              O logo substituirá o cabeçalho em tempo real após salvar.
+            </div>
+          </div>
+
+          <!-- TEMA -->
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Tema</div>
+            <div class="cfg-temas-grid">
+
+              <div class="cfg-tema-item" data-tema="light">
+                <div class="cfg-tema-preview cfg-tema-preview-light">
+                  <div class="cfg-tema-preview-bar"></div>
+                  <div class="cfg-tema-preview-content"></div>
+                </div>
+                <span>Claro</span>
+              </div>
+
+              <div class="cfg-tema-item" data-tema="dark">
+                <div class="cfg-tema-preview cfg-tema-preview-dark">
+                  <div class="cfg-tema-preview-bar"></div>
+                  <div class="cfg-tema-preview-content"></div>
+                </div>
+                <span>Escuro</span>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Interface</div>
+            <div class="cfg-toggles">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Sidebar recolhida por padrão</div>
+                  <div class="cfg-toggle-desc">Inicia com o menu lateral minimizado</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-sidebar-collapsed">
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Animações reduzidas</div>
+                  <div class="cfg-toggle-desc">Desativa transições para melhor performance</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-anim-reduzida">
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Densidade compacta</div>
+                  <div class="cfg-toggle-desc">Reduz espaçamentos para exibir mais informações</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-densidade">
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== SEGURANÇA ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-seguranca">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-shield-check"></i> Segurança
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Política de senhas</div>
+            <div class="cfg-toggles">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Exigir senha forte</div>
+                  <div class="cfg-toggle-desc">Mínimo 8 caracteres com letras, números e símbolos</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-senha-forte" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Expiração de senha</div>
+                  <div class="cfg-toggle-desc">Exige troca periódica de senha pelos usuários</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-senha-expira" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Prazo para expiração</div>
+                  <div class="cfg-toggle-desc">Dias até obrigar troca de senha</div>
+                </div>
+                <select class="form-control" style="width:140px;" id="cfg-prazo-senha">
+                  <option value="30">30 dias</option>
+                  <option value="60" selected>60 dias</option>
+                  <option value="90">90 dias</option>
+                  <option value="180">180 dias</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Autenticação</div>
+            <div class="cfg-toggles">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Autenticação em dois fatores (2FA)</div>
+                  <div class="cfg-toggle-desc">Exige código extra no login via e-mail ou app</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-2fa">
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Bloquear após tentativas falhas</div>
+                  <div class="cfg-toggle-desc">Quantidade de tentativas antes de bloquear o acesso</div>
+                </div>
+                <select class="form-control" style="width:140px;" id="cfg-tentativas">
+                  <option value="3">3 tentativas</option>
+                  <option value="5" selected>5 tentativas</option>
+                  <option value="10">10 tentativas</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== NOTIFICAÇÕES ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-notificacoes">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-bell"></i> Notificações
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">E-mail</div>
+            <div class="cfg-form-grid">
+              <div class="form-group">
+                <label class="form-label">E-mail de destino</label>
+                <input type="email" class="form-control" id="cfg-email-notif"
+                  placeholder="seguranca@empresa.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CC (cópia)</label>
+                <input type="email" class="form-control" id="cfg-email-cc"
+                  placeholder="gestor@empresa.com">
+              </div>
+            </div>
+            <div class="cfg-toggles mt-4">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Acessos negados</div>
+                  <div class="cfg-toggle-desc">Notifica por e-mail em cada acesso negado</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-notif-negado" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Ocorrências críticas</div>
+                  <div class="cfg-toggle-desc">Notifica em ocorrências de prioridade crítica</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-notif-critico" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Equipamento offline</div>
+                  <div class="cfg-toggle-desc">Notifica quando um equipamento perde conexão</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-notif-offline" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Relatórios automáticos</div>
+                  <div class="cfg-toggle-desc">Envia relatório diário por e-mail</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-notif-relatorio">
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== INTEGRAÇÃO ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-integracao">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-plugs-connected"></i> Integração
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">API Control iD</div>
+            <div class="cfg-form-grid">
+              <div class="form-group">
+                <label class="form-label">URL base da API</label>
+                <input type="text" class="form-control" id="cfg-api-url"
+                  placeholder="http://192.168.1.100">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Porta</label>
+                <input type="text" class="form-control" id="cfg-api-porta"
+                  placeholder="80">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Usuário</label>
+                <input type="text" class="form-control" id="cfg-api-usuario"
+                  placeholder="admin">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Senha</label>
+                <input type="password" class="form-control" id="cfg-api-senha"
+                  placeholder="••••••••">
+              </div>
+            </div>
+            <div class="cfg-integ-acoes">
+              <button class="btn btn-ghost btn-sm" id="btn-testar-api">
+                <i class="ph ph-plug"></i> Testar conexão
+              </button>
+              <div class="cfg-integ-status" id="cfg-api-status">
+                <i class="ph ph-circle" style="color:var(--text-muted);"></i>
+                <span class="text-sm text-muted">Não testado</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Sincronização</div>
+            <div class="cfg-toggles">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Sincronização automática</div>
+                  <div class="cfg-toggle-desc">Sincroniza funcionários e regras com o equipamento automaticamente</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-sync-auto" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Intervalo de sincronização</div>
+                  <div class="cfg-toggle-desc">Frequência de sincronização automática</div>
+                </div>
+                <select class="form-control" style="width:140px;" id="cfg-sync-intervalo">
+                  <option value="1">1 minuto</option>
+                  <option value="5" selected>5 minutos</option>
+                  <option value="15">15 minutos</option>
+                  <option value="30">30 minutos</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== USUÁRIOS DO SISTEMA ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-usuarios">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-users-three"></i> Usuários do sistema
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><i class="ph ph-users"></i> Operadores cadastrados</span>
+              <button class="btn btn-primary btn-sm" id="btn-novo-operador">
+                <i class="ph ph-plus"></i> Novo operador
+              </button>
+            </div>
+
+            <div class="cfg-usuarios-empty" id="cfg-usuarios-empty">
+              <i class="ph ph-users-three"></i>
+              <h3>Nenhum operador cadastrado</h3>
+              <p>Adicione usuários que poderão acessar e operar este sistema.</p>
+            </div>
+
+            <div class="table-wrapper cfg-hidden" id="cfg-usuarios-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Operador</th>
+                    <th>E-mail</th>
+                    <th>Perfil</th>
+                    <th>Último acesso</th>
+                    <th>Status</th>
+                    <th style="width:100px;">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="cfg-usuarios-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== BACKUP ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-backup">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-cloud-arrow-up"></i> Backup
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Backup automático</div>
+            <div class="cfg-toggles">
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Ativar backup automático</div>
+                  <div class="cfg-toggle-desc">Realiza backup do banco de dados automaticamente</div>
+                </div>
+                <label class="cfg-toggle">
+                  <input type="checkbox" id="cfg-backup-auto" checked>
+                  <span class="cfg-toggle-track"></span>
+                </label>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Frequência</div>
+                  <div class="cfg-toggle-desc">Intervalo entre backups automáticos</div>
+                </div>
+                <select class="form-control" style="width:140px;" id="cfg-backup-freq">
+                  <option value="hora">A cada hora</option>
+                  <option value="diario" selected>Diário</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensal">Mensal</option>
+                </select>
+              </div>
+
+              <div class="cfg-toggle-row">
+                <div class="cfg-toggle-info">
+                  <div class="cfg-toggle-label">Retenção dos backups</div>
+                  <div class="cfg-toggle-desc">Período de armazenamento antes de excluir automaticamente</div>
+                </div>
+                <select class="form-control" style="width:140px;" id="cfg-backup-retencao">
+                  <option value="7">7 dias</option>
+                  <option value="30" selected>30 dias</option>
+                  <option value="90">90 dias</option>
+                  <option value="365">1 ano</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Backup manual</div>
+            <p class="text-sm text-muted mb-4">
+              Gere um backup completo do sistema agora e faça o download do arquivo.
+            </p>
+            <div class="cfg-backup-acoes">
+              <button class="btn btn-primary btn-sm" id="btn-backup-agora">
+                <i class="ph ph-cloud-arrow-up"></i> Fazer backup agora
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btn-backup-restaurar">
+                <i class="ph ph-cloud-arrow-down"></i> Restaurar backup
+              </button>
+            </div>
+            <div class="cfg-backup-ultimo text-sm text-muted mt-3" id="cfg-backup-ultimo">
+              <i class="ph ph-clock"></i> Último backup: —
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==================== AVANÇADO ==================== -->
+        <section class="cfg-secao cfg-hidden" id="secao-avancado">
+
+          <div class="cfg-secao-titulo">
+            <i class="ph ph-warning-octagon"></i> Avançado
+          </div>
+
+          <div class="cfg-card cfg-card-danger">
+            <div class="cfg-card-titulo">Zona de perigo</div>
+            <p class="text-sm text-muted mb-4">
+              As ações abaixo são irreversíveis. Prossiga com extrema cautela.
+            </p>
+
+            <div class="cfg-danger-list">
+
+              <div class="cfg-danger-item">
+                <div class="cfg-danger-info">
+                  <div class="cfg-danger-titulo">Limpar logs de auditoria</div>
+                  <div class="cfg-danger-desc">Remove permanentemente todos os registros de auditoria do sistema</div>
+                </div>
+                <button class="btn btn-danger btn-sm" id="btn-limpar-logs">
+                  <i class="ph ph-trash"></i> Limpar logs
+                </button>
+              </div>
+
+              <div class="cfg-danger-item">
+                <div class="cfg-danger-info">
+                  <div class="cfg-danger-titulo">Redefinir todas as configurações</div>
+                  <div class="cfg-danger-desc">Restaura todas as configurações para os valores de fábrica</div>
+                </div>
+                <button class="btn btn-danger btn-sm" id="btn-reset-cfg">
+                  <i class="ph ph-arrow-counter-clockwise"></i> Redefinir
+                </button>
+              </div>
+
+              <div class="cfg-danger-item">
+                <div class="cfg-danger-info">
+                  <div class="cfg-danger-titulo">Limpar base de dados</div>
+                  <div class="cfg-danger-desc">Apaga todos os registros de funcionários, acessos e ocorrências</div>
+                </div>
+                <button class="btn btn-danger btn-sm" id="btn-limpar-base">
+                  <i class="ph ph-database"></i> Limpar base
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="cfg-card">
+            <div class="cfg-card-titulo">Informações do sistema</div>
+            <div class="cfg-sysinfo-list">
+              <div class="cfg-sysinfo-row">
+                <span class="cfg-sysinfo-label">Versão</span>
+                <span class="cfg-sysinfo-valor">CRV v1.0.0</span>
+              </div>
+              <div class="cfg-sysinfo-row">
+                <span class="cfg-sysinfo-label">Banco de dados</span>
+                <span class="cfg-sysinfo-valor" id="cfg-db-info">Supabase (PostgreSQL)</span>
+              </div>
+              <div class="cfg-sysinfo-row">
+                <span class="cfg-sysinfo-label">Último backup</span>
+                <span class="cfg-sysinfo-valor" id="cfg-ultimo-backup">—</span>
+              </div>
+              <div class="cfg-sysinfo-row">
+                <span class="cfg-sysinfo-label">Ambiente</span>
+                <span class="cfg-sysinfo-valor">Produção</span>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: NOVO / EDITAR OPERADOR -->
+<div class="modal-overlay cfg-hidden" id="modal-operador">
+  <div class="modal">
+
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-operador-titulo">
+        <i class="ph ph-user-plus"></i> Novo operador
+      </h3>
+      <button class="modal-close" id="modal-operador-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="operador-id">
+      <div class="form-group">
+        <label class="form-label">Nome completo <span style="color:var(--danger)">*</span></label>
+        <input type="text" class="form-control" id="operador-nome" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail <span style="color:var(--danger)">*</span></label>
+        <input type="email" class="form-control" id="operador-email" placeholder="joao@empresa.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Perfil de acesso</label>
+        <select class="form-control" id="operador-perfil">
+          <option value="admin">Administrador — acesso total</option>
+          <option value="operador" selected>Operador — operações sem configurações</option>
+          <option value="visualizador">Visualizador — somente leitura</option>
+        </select>
+      </div>
+      <div class="form-group" id="operador-senha-grupo">
+        <label class="form-label">Senha provisória <span style="color:var(--danger)">*</span></label>
+        <input type="password" class="form-control" id="operador-senha" placeholder="Mínimo 8 caracteres">
+        <span class="text-sm text-muted mt-1" style="display:block;">
+          O usuário deverá trocar a senha no primeiro acesso.
+        </span>
+      </div>
+      <div id="modal-operador-erro" style="display:none;color:var(--danger);font-size:.85rem;margin-top:.5rem;"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-operador-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-operador-salvar">
+        <i class="ph ph-floppy-disk"></i> Salvar operador
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- 1. Lib CDN do Supabase — DEVE vir primeiro -->
+<script src="static/js/vendor/supabase.min.js"></script>
+
+<!-- 2. Seus scripts na ordem correta -->
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/core/session.js"></script>
+<script src="static/js/core/api.js"></script>
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/configuracoes.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,743 @@
+/* ============================================================
+   CREDENCIAIS
+   CRV Controle de Acesso
+   ============================================================ */
+
+
+/* ============================================================
+   HEADER DA PÁGINA
+   ============================================================ */
+
+.page-header{
+
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:24px;
+
+  margin-bottom:28px;
+
+}
+
+.page-header .flex{
+
+  display:flex;
+  align-items:center;
+  gap:12px;
+
+}
+
+.page-title{
+  margin:0;
+}
+
+.page-header p{
+  margin-top:6px;
+}
+
+
+
+/* ============================================================
+   KPIs
+   ============================================================ */
+
+.kpi-grid{
+
+  display:grid;
+
+  gap:20px;
+
+  margin-bottom:26px;
+
+}
+
+
+
+/* ============================================================
+   ABAS
+   ============================================================ */
+
+.cred-tabs{
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  border-bottom:1px solid var(--border);
+
+  padding-bottom:6px;
+
+  margin-bottom:22px;
+
+}
+
+.cred-tab{
+
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  padding:10px 16px;
+
+  font-size:13px;
+  font-weight:600;
+
+  border:none;
+  border-radius:var(--radius-sm);
+
+  background:transparent;
+
+  color:var(--text-muted);
+
+  cursor:pointer;
+
+  transition:
+  background var(--transition),
+  color var(--transition),
+  border-color var(--transition);
+
+}
+
+.cred-tab i{
+  font-size:16px;
+}
+
+.cred-tab:hover{
+
+  color:var(--text-primary);
+
+  background:var(--surface-2);
+
+}
+
+.cred-tab.active{
+
+  color:var(--primary);
+
+  background:var(--primary-light);
+
+}
+
+
+
+/* ============================================================
+   FILTROS
+   ============================================================ */
+
+.func-filtros{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:14px;
+
+}
+
+.func-busca{
+
+  flex:1;
+  min-width:260px;
+
+}
+
+.func-select{
+
+  width:200px;
+
+}
+
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.func-empty{
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:center;
+  text-align:center;
+
+  padding:36px 24px;
+
+  gap:12px;
+
+}
+
+.func-empty i{
+
+  font-size:28px;
+
+  color:var(--primary);
+
+}
+
+.func-empty h3{
+
+  margin-top:6px;
+
+  font-size:18px;
+
+}
+
+.func-empty p{
+
+  max-width:480px;
+
+  color:var(--text-muted);
+
+}
+
+
+
+/* ============================================================
+   TABELA
+   ============================================================ */
+
+.table-wrapper{
+
+  margin-top:20px;
+
+  overflow:auto;
+
+}
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+}
+
+thead{
+
+  background:var(--surface-2);
+
+}
+
+thead th{
+
+  font-size:12px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.04em;
+
+  color:var(--text-muted);
+
+  padding:14px;
+
+  text-align:left;
+
+}
+
+tbody td{
+
+  padding:14px;
+
+  border-top:1px solid var(--border);
+
+  font-size:14px;
+
+}
+
+
+
+/* ============================================================
+   AVATAR
+   ============================================================ */
+
+.cred-row-avatar{
+
+  width:34px;
+  height:34px;
+
+  border-radius:50%;
+
+  background:var(--primary);
+
+  color:#fff;
+
+  font-family:'Rajdhani',sans-serif;
+  font-weight:700;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+}
+
+.cred-row-nome{
+
+  font-weight:600;
+
+}
+
+.cred-row-sub{
+
+  font-size:12px;
+
+  color:var(--text-muted);
+
+}
+
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.cred-tipo-badge{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  padding:5px 12px;
+
+  border-radius:18px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  border:1px solid var(--border);
+
+}
+
+.cred-tipo-badge.cartao{
+
+  background:var(--primary-light);
+
+  color:var(--primary);
+
+}
+
+.cred-tipo-badge.biometria{
+
+  background:rgba(34,197,94,.12);
+
+  color:var(--success);
+
+}
+
+.cred-tipo-badge.facial{
+
+  background:rgba(0,145,173,.08);
+
+  color:var(--info);
+
+}
+
+.cred-tipo-badge.senha{
+
+  background:rgba(255,210,63,.14);
+
+  color:#b45309;
+
+}
+
+/* ============================================================
+MODAL — padrão global do sistema
+============================================================ */
+
+/* Overlay centralizado com blur */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+
+  padding:20px;
+}
+
+/* Estado escondido */
+.modal-overlay.func-table-hidden{
+  display:none !important;
+}
+
+
+/* ============================================================
+CONTAINER DO MODAL
+============================================================ */
+
+.func-modal{
+
+  position:relative;
+
+  width:100%;
+  max-width:640px;
+  max-height:90vh;
+
+  overflow-y:auto;
+
+  border-radius:16px;
+
+  padding:32px;
+
+  background:linear-gradient(
+    160deg,
+    rgba(18,22,34,0.98),
+    rgba(12,15,25,0.99)
+  );
+
+  border:1px solid rgba(0,220,200,0.18);
+
+  box-shadow:
+    0 0 0 1px rgba(0,220,200,0.08),
+    0 8px 40px rgba(0,0,0,0.55),
+    0 0 60px rgba(0,180,220,0.07);
+
+  color:var(--text,#e2e8f0);
+
+  animation:modalFadeIn .22s cubic-bezier(.22,1,.36,1) both;
+
+}
+
+
+/* ============================================================
+TIPOS DE CREDENCIAL
+============================================================ */
+
+.cred-tipo-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:12px;
+  margin-top:6px;
+}
+
+.cred-tipo-item{
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:6px;
+
+  height:80px;
+
+  border-radius:12px;
+
+  border:1px solid rgba(255,255,255,0.08);
+
+  background:rgba(255,255,255,0.02);
+
+  cursor:pointer;
+
+  transition:all .18s;
+
+  font-size:13px;
+  font-weight:500;
+
+}
+
+.cred-tipo-item i{
+  font-size:20px;
+  opacity:.8;
+}
+
+
+/* estado selecionado */
+
+.cred-tipo-item.selected{
+  border-color:var(--primary);
+  background:var(--primary-light);
+
+  box-shadow:
+    0 0 0 3px rgba(0,220,200,0.15),
+    0 0 18px rgba(0,220,200,0.1);
+}
+
+.cred-tipo-item:hover{
+  border-color:var(--primary);
+  background:var(--primary-light);
+}
+
+
+/* ============================================================
+FOOTER DO MODAL
+============================================================ */
+
+.func-modal .modal-footer{
+
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+
+  gap:10px;
+
+  margin-top:28px;
+  padding-top:20px;
+
+  border-top:1px solid rgba(255,255,255,0.06);
+
+}
+
+
+/* ============================================================
+TEMA CLARO
+============================================================ */
+
+[data-theme="light"] .func-modal,
+.light-mode .func-modal{
+
+  background:linear-gradient(160deg,#ffffff,#f4f6fb);
+
+  border:1px solid rgba(0,180,200,0.22);
+
+  box-shadow:
+    0 8px 40px rgba(0,0,0,0.10),
+    0 0 40px rgba(0,180,220,0.06);
+
+  color:#1a202c;
+
+}
+
+[data-theme="light"] .func-modal .modal-footer,
+.light-mode .func-modal .modal-footer{
+  border-top-color:#e2e8f0;
+}
+
+
+/* ============================================================
+ANIMAÇÃO
+============================================================ */
+
+@keyframes modalFadeIn{
+
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(.98);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+
+}
+
+
+/* ============================================================
+SCROLLBAR
+============================================================ */
+
+.func-modal::-webkit-scrollbar{
+  width:5px;
+}
+
+.func-modal::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.func-modal::-webkit-scrollbar-thumb{
+  background:rgba(0,220,200,0.2);
+  border-radius:99px;
+}
+
+/* ============================================================
+BOTÃO FECHAR MODAL (X) — padrão funcionários
+============================================================ */
+
+.func-modal-close{
+
+  position:absolute;
+
+  top:16px;
+  right:16px;
+
+  width:32px;
+  height:32px;
+
+  border-radius:8px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+
+  color:inherit;
+
+  cursor:pointer;
+
+  font-size:16px;
+
+  transition:
+  background .2s,
+  border-color .2s,
+  color .2s;
+
+  z-index:10;
+
+}
+
+.func-modal-close:hover{
+
+  background:rgba(255,80,80,0.15);
+  border-color:rgba(255,80,80,0.35);
+
+  color:#ff6b6b;
+
+  box-shadow:0 0 12px rgba(255,80,80,0.2);
+
+}
+
+
+/* tema claro */
+
+[data-theme="light"] .func-modal-close,
+.light-mode .func-modal-close{
+
+  background:#f1f5f9;
+  border-color:#e2e8f0;
+  color:#64748b;
+
+}
+
+[data-theme="light"] .func-modal-close:hover,
+.light-mode .func-modal-close:hover{
+
+  background:#fee2e2;
+  border-color:#fca5a5;
+  color:#ef4444;
+
+}
+
+/* ============================================================
+   GRID TIPOS
+   ============================================================ */
+
+.cred-tipo-grid{
+
+  display:grid;
+
+  grid-template-columns:repeat(4,1fr);
+
+  gap:14px;
+
+}
+
+.cred-tipo-item{
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:18px;
+
+  border:2px solid var(--border);
+
+  border-radius:var(--radius-md);
+
+  background:var(--surface-2);
+
+  cursor:pointer;
+
+  transition:
+  border-color var(--transition),
+  background var(--transition),
+  box-shadow var(--transition);
+
+}
+
+.cred-tipo-item i{
+
+  font-size:22px;
+
+}
+
+.cred-tipo-item:hover{
+
+  border-color:var(--primary);
+
+  background:var(--primary-light);
+
+}
+
+.cred-tipo-item.selected{
+
+  border-color:var(--primary);
+
+  background:var(--primary-light);
+
+  box-shadow:0 0 0 3px rgba(0,145,173,.15);
+
+}
+
+
+/* ============================================================
+   BIOMETRIA AVISO
+   ============================================================ */
+
+.cred-bio-aviso{
+
+  display:flex;
+  align-items:flex-start;
+
+  gap:12px;
+
+  padding:16px;
+
+  border-radius:var(--radius-md);
+
+  background:rgba(0,145,173,.12);
+
+  border:1px solid rgba(0,145,173,.25);
+
+  color:var(--text-primary);
+
+  font-size:13px;
+
+  line-height:1.6;
+
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+
+@media (max-width:900px){
+
+  .cred-tipo-grid{
+
+    grid-template-columns:repeat(2,1fr);
+
+  }
+
+}
+
+@media (max-width:640px){
+
+  .func-filtros{
+
+    flex-direction:column;
+
+  }
+
+  .func-select{
+
+    width:100%;
+
+  }
+
+}

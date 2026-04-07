@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios — CRV Controle de Acesso</title>
+  <script src="static/js/vendor/supabase.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/relatorios.css">
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Relatórios</h2>
+    <p class="text-sm text-muted mt-1">Geração e exportação de relatórios do sistema</p>
+    <p class="text-sm text-muted mt-1">
+      Gere, filtre e exporte relatórios de acessos, ocorrências e presença por período.
+    </p>
+  </div>
+  <div class="page-actions">
+    <button class="btn btn-ghost btn-sm" id="btn-agendar">
+      <i class="ph ph-calendar-plus"></i> Agendar relatório
+    </button>
+    <button class="btn btn-primary btn-sm" id="btn-gerar">
+      <i class="ph ph-file-arrow-down"></i> Gerar relatório
+    </button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid">
+
+  <div class="kpi-card" style="border-top:3px solid var(--primary);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Gerados hoje</span>
+      <i class="ph ph-file-text kpi-icon" style="color:var(--primary);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">relatórios exportados</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--success);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Agendados</span>
+      <i class="ph ph-calendar-check kpi-icon" style="color:var(--success);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">envios automáticos</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--warning);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Este mês</span>
+      <i class="ph ph-chart-bar kpi-icon" style="color:var(--warning);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">total de acessos</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--danger);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Ocorrências</span>
+      <i class="ph ph-warning kpi-icon" style="color:var(--danger);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">registradas no período</div>
+  </div>
+
+</div>
+
+    <!-- Grid principal -->
+    <div class="rel-grid">
+
+      <!-- Coluna esquerda: tipos de relatório -->
+      <div class="rel-col-tipos">
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="ph ph-squares-four"></i> Tipos de Relatório</span>
+          </div>
+
+          <div class="rel-tipos-list">
+
+            <div class="rel-tipo-item active" data-tipo="acesso">
+              <div class="rel-tipo-icon">
+                <i class="ph ph-door-open"></i>
+              </div>
+              <div class="rel-tipo-info">
+                <div class="rel-tipo-nome">Controle de Acesso</div>
+                <div class="rel-tipo-desc">Entradas, saídas e acessos negados</div>
+              </div>
+              <i class="ph ph-caret-right rel-tipo-seta"></i>
+            </div>
+
+            <div class="rel-tipo-item" data-tipo="presenca">
+              <div class="rel-tipo-icon">
+                <i class="ph ph-users"></i>
+              </div>
+              <div class="rel-tipo-info">
+                <div class="rel-tipo-nome">Presença de Funcionários</div>
+                <div class="rel-tipo-desc">Frequência, pontualidade e ausências</div>
+              </div>
+              <i class="ph ph-caret-right rel-tipo-seta"></i>
+            </div>
+
+            <div class="rel-tipo-item" data-tipo="ocorrencias">
+              <div class="rel-tipo-icon">
+                <i class="ph ph-warning-circle"></i>
+              </div>
+              <div class="rel-tipo-info">
+                <div class="rel-tipo-nome">Ocorrências</div>
+                <div class="rel-tipo-desc">Eventos críticos e alertas</div>
+              </div>
+              <i class="ph ph-caret-right rel-tipo-seta"></i>
+            </div>
+
+            <div class="rel-tipo-item" data-tipo="equipamentos">
+              <div class="rel-tipo-icon">
+                <i class="ph ph-devices"></i>
+              </div>
+              <div class="rel-tipo-info">
+                <div class="rel-tipo-nome">Equipamentos</div>
+                <div class="rel-tipo-desc">Status, uptime e manutenções</div>
+              </div>
+              <i class="ph ph-caret-right rel-tipo-seta"></i>
+            </div>
+
+            <div class="rel-tipo-item" data-tipo="visitantes">
+              <div class="rel-tipo-icon">
+                <i class="ph ph-user-plus"></i>
+              </div>
+              <div class="rel-tipo-info">
+                <div class="rel-tipo-nome">Visitantes</div>
+                <div class="rel-tipo-desc">Registros de entrada de externos</div>
+              </div>
+              <i class="ph ph-caret-right rel-tipo-seta"></i>
+            </div>
+
+            <div class="rel-tipo-item" data-tipo="auditoria">
+              <div class="rel-tipo-icon">
+                <i class="ph ph-shield-check"></i>
+              </div>
+              <div class="rel-tipo-info">
+                <div class="rel-tipo-nome">Auditoria do Sistema</div>
+                <div class="rel-tipo-desc">Ações de usuários e alterações</div>
+              </div>
+              <i class="ph ph-caret-right rel-tipo-seta"></i>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Coluna direita: configuração + prévia -->
+      <div class="rel-col-config">
+
+        <!-- Configuração do relatório -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="ph ph-sliders"></i> Configuração</span>
+            <span class="rel-tipo-badge" id="rel-tipo-badge">Controle de Acesso</span>
+          </div>
+
+          <div class="rel-config-body">
+
+            <div class="rel-config-row">
+              <div class="form-group">
+                <label class="form-label">Período</label>
+                <select class="form-control" id="rel-periodo">
+                  <option value="hoje">Hoje</option>
+                  <option value="ontem">Ontem</option>
+                  <option value="semana">Esta semana</option>
+                  <option value="mes" selected>Este mês</option>
+                  <option value="mes_ant">Mês anterior</option>
+                  <option value="personalizado">Personalizado</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Formato</label>
+                <select class="form-control" id="rel-formato">
+                  <option value="pdf">PDF</option>
+                  <option value="xlsx">Excel (XLSX)</option>
+                  <option value="csv">CSV</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Datas personalizadas (ocultas por padrão) -->
+            <div class="rel-datas-custom rel-hidden" id="rel-datas-custom">
+              <div class="rel-config-row">
+                <div class="form-group">
+                  <label class="form-label">Data inicial</label>
+                  <input type="date" class="form-control" id="rel-data-ini">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Data final</label>
+                  <input type="date" class="form-control" id="rel-data-fim">
+                </div>
+              </div>
+            </div>
+
+            <div class="rel-config-row">
+              <div class="form-group">
+                <label class="form-label">Setor</label>
+                <select class="form-control" id="rel-setor">
+                  <option value="">Todos os setores</option>
+                  <option>Operações</option>
+                  <option>Administrativo</option>
+                  <option>TI</option>
+                  <option>RH</option>
+                  <option>Financeiro</option>
+                  <option>Segurança</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Funcionário</label>
+                <div class="input-icon-wrap">
+                  <i class="ph ph-user input-icon"></i>
+                  <input type="text" class="form-control" id="rel-funcionario"
+                    placeholder="Todos os funcionários">
+                </div>
+              </div>
+            </div>
+
+            <!-- Campos dinâmicos por tipo -->
+            <div id="rel-campos-extras">
+              <!-- injetado via JS conforme tipo selecionado -->
+            </div>
+
+            <div class="rel-config-acoes">
+              <button class="btn btn-ghost btn-sm" id="btn-rel-previa">
+                <i class="ph ph-eye"></i> Pré-visualizar
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btn-rel-agendar">
+                <i class="ph ph-calendar-plus"></i> Agendar
+              </button>
+              <button class="btn btn-primary" id="btn-rel-gerar">
+                <i class="ph ph-file-arrow-down"></i> Gerar e baixar
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Pré-visualização / Prévia -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="ph ph-eye"></i> Pré-visualização</span>
+            <span class="text-sm text-muted" id="rel-previa-info">Configure e clique em pré-visualizar</span>
+          </div>
+
+          <div class="rel-previa-empty" id="rel-previa-empty">
+            <i class="ph ph-file-text"></i>
+            <h3>Nenhuma prévia gerada</h3>
+            <p>Selecione o tipo, período e filtros desejados e clique em <strong>Pré-visualizar</strong>.</p>
+          </div>
+
+          <div class="rel-previa-content rel-hidden" id="rel-previa-content">
+
+            <!-- Cabeçalho da prévia -->
+            <div class="rel-previa-header">
+              <div class="rel-previa-logo">
+                <i class="ph ph-shield-check"></i>
+                <span>CRV Controle de Acesso</span>
+              </div>
+              <div class="rel-previa-meta" id="rel-previa-meta">
+                <!-- preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- Tabela da prévia -->
+            <div class="table-wrapper" id="rel-previa-table-wrap">
+              <table id="rel-previa-table">
+                <thead id="rel-previa-thead"></thead>
+                <tbody id="rel-previa-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="rel-previa-rodape">
+              <span id="rel-previa-total"></span>
+              <span class="text-sm text-muted">Prévia limitada a 10 registros · relatório completo no download</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Histórico de relatórios gerados -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <span class="card-title"><i class="ph ph-clock-counter-clockwise"></i> Histórico de Relatórios</span>
+        <span class="text-sm text-muted">Últimos gerados</span>
+      </div>
+
+      <div class="rel-historico-empty" id="rel-historico-empty">
+        <i class="ph ph-clock-counter-clockwise"></i>
+        <h3>Nenhum relatório gerado ainda</h3>
+        <p>Os relatórios gerados aparecerão aqui para redownload por até 30 dias.</p>
+      </div>
+
+      <div class="table-wrapper rel-hidden" id="rel-historico-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Período</th>
+              <th>Formato</th>
+              <th>Gerado em</th>
+              <th>Gerado por</th>
+              <th>Tamanho</th>
+              <th style="width:100px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="rel-historico-tbody">
+            <!-- injetado via backend -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/core/session.js"></script>
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/relatorios.js"></script>
+
+</body>
+</html>

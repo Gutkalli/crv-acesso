@@ -1,0 +1,621 @@
+/* =====================================================
+CRV CONTROLE DE ACESSO
+TELA: FUNCIONÁRIOS
+===================================================== */
+
+
+/* =====================================================
+PAGE HEADER
+===================================================== */
+
+.page-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:20px;
+margin-bottom:22px;
+flex-wrap:wrap;
+}
+
+.page-title{
+font-size:22px;
+font-weight:600;
+}
+
+
+/* ações */
+
+.page-actions{
+display:flex;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+
+
+/* =====================================================
+KPI GRID
+===================================================== */
+
+.kpi-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:16px;
+margin-bottom:22px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 110px;
+  transition: all .2s;
+}
+
+.kpi-card:hover {
+  border-color: var(--primary);
+}
+
+.kpi-value{
+font-size:26px;
+font-weight:600;
+}
+
+.kpi-sub{
+font-size:12px;
+opacity:.6;
+}
+
+.kpi-icon{
+font-size:22px;
+}
+
+
+
+/* =====================================================
+CARD FILTROS
+===================================================== */
+
+.func-filtros{
+
+display:flex;
+align-items:center;
+gap:12px;
+
+flex-wrap:wrap;
+
+}
+
+
+/* busca */
+
+.func-busca{
+
+display:flex;
+align-items:center;
+
+width:340px;
+max-width:100%;
+
+position:relative;
+
+}
+
+.func-busca .form-control{
+
+height:40px;
+padding-left:36px;
+
+}
+
+
+/* ícone da busca */
+
+.input-icon-wrap{
+
+position:relative;
+
+display:flex;
+align-items:center;
+
+}
+
+.input-icon{
+
+position:absolute;
+
+left:12px;
+
+font-size:16px;
+
+opacity:.6;
+
+pointer-events:none;
+
+}
+
+
+
+/* selects */
+
+.func-select{
+
+width:180px;
+height:40px;
+
+flex-shrink:0;
+
+}
+
+
+
+/* toggle view */
+
+.func-view-toggle{
+
+display:flex;
+align-items:center;
+gap:6px;
+
+margin-left:auto;
+
+}
+
+.func-view-btn{
+
+width:36px;
+height:36px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+.func-view-btn.active{
+background:var(--primary);
+color:#fff;
+}
+
+
+
+/* =====================================================
+ESTADO VAZIO
+===================================================== */
+
+.func-empty{
+
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+
+text-align:center;
+
+padding:50px 20px;
+
+gap:10px;
+
+}
+
+.func-empty i{
+
+font-size:42px;
+opacity:.6;
+
+}
+
+.func-empty h3{
+font-size:18px;
+font-weight:600;
+}
+
+.func-empty p{
+max-width:420px;
+opacity:.7;
+}
+
+
+
+/* =====================================================
+TABELA
+===================================================== */
+
+.func-table-hidden{
+display:none;
+}
+
+.table-wrapper{
+overflow-x:auto;
+}
+
+#func-table{
+
+width:100%;
+border-collapse:collapse;
+
+}
+
+#func-table th{
+
+font-size:12px;
+font-weight:600;
+
+text-align:left;
+
+padding:12px;
+
+opacity:.7;
+
+border-bottom:1px solid rgba(255,255,255,0.05);
+
+}
+
+#func-table td{
+
+padding:12px;
+
+border-bottom:1px solid rgba(255,255,255,0.03);
+
+}
+
+#func-table tbody tr:hover{
+
+background:rgba(255,255,255,0.02);
+
+}
+
+
+
+/* =====================================================
+CARDS VIEW
+===================================================== */
+
+.func-cards-grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:16px;
+
+margin-top:20px;
+
+}
+
+/* =====================================================
+MODAL FUNCIONÁRIO — padrão global do sistema
+===================================================== */
+
+/* Overlay com blur suave */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 20px;
+}
+
+/* ESCONDE o overlay — !important garante que vence display:flex */
+.modal-overlay.func-table-hidden {
+  display: none !important;
+}
+
+/* Container do modal */
+.func-modal {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 32px;
+  background: linear-gradient(
+    160deg,
+    rgba(18, 22, 34, 0.98),
+    rgba(12, 15, 25, 0.99)
+  );
+  border: 1px solid rgba(0, 220, 200, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(0, 220, 200, 0.08),
+    0 8px 40px rgba(0, 0, 0, 0.55),
+    0 0 60px rgba(0, 180, 220, 0.07);
+  color: var(--text, #e2e8f0);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 220, 200, 0.2) transparent;
+}
+
+/* Tema claro */
+[data-theme="light"] .func-modal,
+.light-mode .func-modal {
+  background: linear-gradient(160deg, #ffffff, #f4f6fb);
+  border: 1px solid rgba(0, 180, 200, 0.22);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.10),
+    0 0 40px rgba(0, 180, 220, 0.06);
+  color: #1a202c;
+}
+
+/* Título */
+.func-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: 0.3px;
+  color: var(--primary, #00dcc8);
+}
+
+.func-modal-title i {
+  font-size: 20px;
+  opacity: 0.85;
+}
+
+[data-theme="light"] .func-modal-title,
+.light-mode .func-modal-title {
+  color: #0891b2;
+}
+
+/* Avatar + upload */
+.func-modal-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.func-modal-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  background: rgba(0, 220, 200, 0.08);
+  border: 2px solid rgba(0, 220, 200, 0.25);
+  box-shadow: 0 0 18px rgba(0, 220, 200, 0.12);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.func-modal-avatar:hover {
+  border-color: rgba(0, 220, 200, 0.5);
+  box-shadow: 0 0 28px rgba(0, 220, 200, 0.22);
+}
+
+[data-theme="light"] .func-modal-avatar,
+.light-mode .func-modal-avatar {
+  background: rgba(8, 145, 178, 0.07);
+  border-color: rgba(8, 145, 178, 0.3);
+  box-shadow: 0 0 14px rgba(8, 145, 178, 0.12);
+}
+
+/* Seções de formulário */
+.modal-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  margin-top: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 220, 200, 0.12);
+  color: rgba(0, 220, 200, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-theme="light"] .modal-section-title,
+.light-mode .modal-section-title {
+  border-bottom-color: rgba(8, 145, 178, 0.18);
+  color: #0891b2;
+}
+
+/* Grid 2 colunas */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Labels */
+.func-modal .form-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  opacity: 0.75;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Inputs e selects */
+.func-modal .form-control,
+.func-modal .form-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  color: inherit;
+  height: 42px;
+  padding: 0 14px;
+  font-size: 14px;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.func-modal .form-control:focus,
+.func-modal .form-select:focus {
+  border-color: rgba(0, 220, 200, 0.5);
+  box-shadow: 0 0 0 3px rgba(0, 220, 200, 0.10);
+  background: rgba(0, 220, 200, 0.04);
+}
+
+[data-theme="light"] .func-modal .form-control,
+[data-theme="light"] .func-modal .form-select,
+.light-mode .func-modal .form-control,
+.light-mode .func-modal .form-select {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #1a202c;
+}
+
+[data-theme="light"] .func-modal .form-control:focus,
+[data-theme="light"] .func-modal .form-select:focus,
+.light-mode .func-modal .form-control:focus,
+.light-mode .func-modal .form-select:focus {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.12);
+  background: #fff;
+}
+
+/* Footer — usa .modal-footer que está no HTML */
+.func-modal .modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .func-modal .modal-footer,
+.light-mode .func-modal .modal-footer {
+  border-top-color: #e2e8f0;
+}
+
+/* Botão fechar (×) */
+.func-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  z-index: 10;
+}
+
+.func-modal-close:hover {
+  background: rgba(255, 80, 80, 0.15);
+  border-color: rgba(255, 80, 80, 0.35);
+  color: #ff6b6b;
+  box-shadow: 0 0 12px rgba(255, 80, 80, 0.2);
+}
+
+[data-theme="light"] .func-modal-close,
+.light-mode .func-modal-close {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+[data-theme="light"] .func-modal-close:hover,
+.light-mode .func-modal-close:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #ef4444;
+}
+
+/* Toggle ativo/inativo */
+.func-modal-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Animação de entrada */
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.func-modal {
+  animation: modalFadeIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Scrollbar webkit */
+.func-modal::-webkit-scrollbar { width: 5px; }
+.func-modal::-webkit-scrollbar-track { background: transparent; }
+.func-modal::-webkit-scrollbar-thumb {
+  background: rgba(0, 220, 200, 0.2);
+  border-radius: 99px;
+}
+
+/* =====================================================
+RESPONSIVO
+===================================================== */
+
+@media (max-width:900px){
+
+.func-filtros{
+
+flex-direction:column;
+align-items:stretch;
+
+}
+
+.func-busca{
+width:100%;
+}
+
+.func-select{
+width:100%;
+}
+
+.func-view-toggle{
+
+margin-left:0;
+margin-top:4px;
+
+}
+
+.form-grid-2{
+grid-template-columns:1fr;
+}
+
+}
+
+
+@media (max-width:600px){
+
+.page-header{
+
+flex-direction:column;
+align-items:flex-start;
+
+}
+
+.page-actions{
+width:100%;
+}
+
+.kpi-grid{
+grid-template-columns:1fr;
+}
+
+}

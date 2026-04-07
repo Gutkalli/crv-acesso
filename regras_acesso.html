@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regras de Acesso — CRV Controle de Acesso</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="static/js/vendor/supabase.min.js"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/regras_acesso.css">
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<!-- HEADER -->
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Regras de Acesso</h2>
+    <p class="text-sm text-muted mt-1">Horários, grupos e permissões por área</p>
+    <p class="text-sm text-muted mt-1">
+      Defina quem pode acessar cada área, em quais horários e com quais restrições.
+    </p>
+  </div>
+  <div class="page-actions" style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-ghost btn-sm" id="btn-exportar">
+      <i class="ph ph-download-simple"></i> Exportar
+    </button>
+    <button class="btn btn-primary btn-sm" id="btn-nova-regra">
+      <i class="ph ph-plus"></i> Nova Regra
+    </button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px;">
+
+  <div class="kpi-card" style="border-top:3px solid var(--success);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Regras ativas</span>
+      <i class="ph ph-shield-check kpi-icon" style="color:var(--success);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-regras">0</div>
+    <div class="kpi-sub">em vigor</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--primary);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Grupos</span>
+      <i class="ph ph-users-three kpi-icon" style="color:var(--primary);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-grupos">0</div>
+    <div class="kpi-sub">grupos configurados</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--danger);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Áreas restritas</span>
+      <i class="ph ph-lock kpi-icon" style="color:var(--danger);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-areas">0</div>
+    <div class="kpi-sub">zonas controladas</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--warning);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Faixas de horário</span>
+      <i class="ph ph-clock kpi-icon" style="color:var(--warning);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-horarios">0</div>
+    <div class="kpi-sub">períodos cadastrados</div>
+  </div>
+
+</div>
+
+    <!-- ABAS -->
+    <div class="regra-tabs">
+      <button class="regra-tab active" data-tab="areas">
+        <i class="ph ph-map-pin"></i> 1. Áreas
+      </button>
+      <button class="regra-tab" data-tab="grupos">
+        <i class="ph ph-users-three"></i> 2. Grupos
+      </button>
+      <button class="regra-tab" data-tab="regras">
+        <i class="ph ph-shield"></i> 3. Regras
+      </button>
+    </div>
+
+    <!-- TAB: ÁREAS -->
+    <div id="tab-areas">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="ph ph-map-pin"></i> Áreas</span>
+          <button class="btn btn-primary btn-sm" id="btn-nova-area">
+            <i class="ph ph-plus"></i> Nova Área
+          </button>
+        </div>
+        <div class="regra-empty" id="areas-empty">
+          <i class="ph ph-map-trifold"></i>
+          <h3>Nenhuma área cadastrada</h3>
+          <p>Cadastre os locais físicos da empresa. Ex: Recepção, Sala de Servidores, Almoxarifado.</p>
+          <button class="btn btn-primary btn-sm mt-4" id="btn-nova-area-empty">
+            <i class="ph ph-plus"></i> Cadastrar Área
+          </button>
+        </div>
+        <div class="regra-areas-grid regra-hidden" id="areas-grid"></div>
+      </div>
+    </div>
+
+    <!-- TAB: GRUPOS -->
+    <div id="tab-grupos" class="regra-hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="ph ph-users-three"></i> Grupos</span>
+          <button class="btn btn-primary btn-sm" id="btn-novo-grupo">
+            <i class="ph ph-plus"></i> Novo Grupo
+          </button>
+        </div>
+        <div class="regra-empty" id="grupos-empty">
+          <i class="ph ph-users-three"></i>
+          <h3>Nenhum grupo criado</h3>
+          <p>Crie grupos de funcionários. Ex: Administrativo, TI, Diretoria.</p>
+          <button class="btn btn-primary btn-sm mt-4" id="btn-novo-grupo-empty">
+            <i class="ph ph-plus"></i> Criar Grupo
+          </button>
+        </div>
+        <div class="regra-grupos-grid regra-hidden" id="grupos-grid"></div>
+      </div>
+    </div>
+
+    <!-- TAB: REGRAS -->
+    <div id="tab-regras" class="regra-hidden">
+
+      <div class="card mb-4">
+        <div class="func-filtros">
+          <div class="input-icon-wrap func-busca">
+            <i class="ph ph-magnifying-glass input-icon"></i>
+            <input type="text" class="form-control" id="busca-regras"
+              placeholder="Buscar regra, grupo ou área...">
+          </div>
+          <select class="form-control func-select" id="filtro-tipo">
+            <option value="">Todos os tipos</option>
+            <option value="horario">Horário</option>
+            <option value="area">Área</option>
+            <option value="grupo">Grupo</option>
+            <option value="excecao">Exceção</option>
+          </select>
+          <select class="form-control func-select" id="filtro-status">
+            <option value="">Todos os status</option>
+            <option value="ativa">Ativa</option>
+            <option value="inativa">Inativa</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="ph ph-shield"></i> Lista de Regras</span>
+          <span class="text-sm text-muted" id="regras-total">0 regras</span>
+        </div>
+        <div class="regra-empty" id="regras-empty">
+          <i class="ph ph-shield-slash"></i>
+          <h3>Nenhuma regra configurada</h3>
+          <p>Para criar uma regra, primeiro cadastre as <strong>Áreas</strong> e os <strong>Grupos</strong> nas abas anteriores. Depois volte aqui para definir quem acessa onde e quando.<br><br>Ex: <em>"O grupo Administrativo pode entrar na Recepção de Seg a Sex das 08h às 18h"</em></p>
+          <button class="btn btn-primary btn-sm mt-4" id="btn-nova-regra-empty">
+            <i class="ph ph-plus"></i> Nova Regra
+          </button>
+        </div>
+        <div class="table-wrapper regra-hidden" id="regras-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Grupo</th>
+                <th>Área</th>
+                <th>Horário</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th style="width:100px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="regras-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: REGRA -->
+<div class="regra-overlay regra-hidden" id="modal-regra">
+  <div class="regra-modal-box">
+    <div class="regra-modal-header">
+      <h3 class="regra-modal-titulo" id="modal-regra-titulo">
+        <i class="ph ph-shield-plus"></i> Nova Regra
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-icon" id="modal-regra-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    <div class="regra-modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="r-nome"
+          placeholder="Ex: Administrativo na Recepção - Comercial">
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Tipo <span class="form-required">*</span></label>
+          <select class="form-control" id="r-tipo">
+            <option value="">Selecione...</option>
+            <option value="horario">Horário</option>
+            <option value="area">Área</option>
+            <option value="grupo">Grupo</option>
+            <option value="excecao">Exceção</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prioridade</label>
+          <select class="form-control" id="r-prioridade">
+            <option value="normal">Normal</option>
+            <option value="alta">Alta</option>
+            <option value="critica">Crítica</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Grupo</label>
+          <select class="form-control" id="r-grupo">
+            <option value="">Cadastre grupos na aba 2. Grupos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Área</label>
+          <select class="form-control" id="r-area">
+            <option value="">Cadastre áreas na aba 1. Áreas</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Hora início</label>
+          <input type="time" class="form-control" id="r-hora-inicio">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hora fim</label>
+          <input type="time" class="form-control" id="r-hora-fim">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" id="r-status">
+          <option value="ativa">Ativa</option>
+          <option value="inativa">Inativa</option>
+        </select>
+      </div>
+      <div class="modal-section-title" style="font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin-bottom:8px;">Dias da semana</div>
+      <div class="regra-dias-wrap">
+        <label class="regra-dia"><input type="checkbox" value="1" checked> Seg</label>
+        <label class="regra-dia"><input type="checkbox" value="2" checked> Ter</label>
+        <label class="regra-dia"><input type="checkbox" value="3" checked> Qua</label>
+        <label class="regra-dia"><input type="checkbox" value="4" checked> Qui</label>
+        <label class="regra-dia"><input type="checkbox" value="5" checked> Sex</label>
+        <label class="regra-dia"><input type="checkbox" value="6"> Sáb</label>
+        <label class="regra-dia"><input type="checkbox" value="0"> Dom</label>
+      </div>
+    </div>
+    <div class="regra-modal-footer">
+      <button class="btn btn-ghost" id="btn-regra-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-regra-salvar">
+        <i class="ph ph-floppy-disk"></i> Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GRUPO -->
+<div class="regra-overlay regra-hidden" id="modal-grupo">
+  <div class="regra-modal-box">
+    <div class="regra-modal-header">
+      <h3 class="regra-modal-titulo" id="modal-grupo-titulo">
+        <i class="ph ph-users-three"></i> Novo Grupo
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-icon" id="modal-grupo-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    <div class="regra-modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome do grupo <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="g-nome"
+          placeholder="Ex: Administrativo, TI, Diretoria">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <input type="text" class="form-control" id="g-descricao"
+          placeholder="Ex: Funcionários do setor administrativo">
+      </div>
+    </div>
+    <div class="regra-modal-footer">
+      <button class="btn btn-ghost" id="btn-grupo-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-grupo-salvar">
+        <i class="ph ph-floppy-disk"></i> Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ÁREA -->
+<div class="regra-overlay regra-hidden" id="modal-area">
+  <div class="regra-modal-box">
+    <div class="regra-modal-header">
+      <h3 class="regra-modal-titulo" id="modal-area-titulo">
+        <i class="ph ph-map-pin"></i> Nova Área
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-icon" id="modal-area-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    <div class="regra-modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome da área <span class="form-required">*</span></label>
+        <input type="text" class="form-control" id="a-nome"
+          placeholder="Ex: Sala de Servidores, Recepção, Almoxarifado">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <input type="text" class="form-control" id="a-descricao"
+          placeholder="Ex: Acesso restrito à equipe de TI">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nível de restrição</label>
+        <select class="form-control" id="a-nivel">
+          <option value="baixo">Baixo</option>
+          <option value="medio">Médio</option>
+          <option value="alto">Alto</option>
+          <option value="critico">Crítico</option>
+        </select>
+      </div>
+    </div>
+    <div class="regra-modal-footer">
+      <button class="btn btn-ghost" id="btn-area-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-area-salvar">
+        <i class="ph ph-floppy-disk"></i> Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS — ordem idêntica ao funcionarios.html -->
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/api.js"></script>
+<script src="static/js/core/db.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/core/sync.js"></script>
+<script src="static/js/core/session.js"></script>
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/regras_acesso.js"></script>
+
+</body>
+</html>

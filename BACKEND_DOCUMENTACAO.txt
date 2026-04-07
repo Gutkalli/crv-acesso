@@ -1,0 +1,682 @@
+================================================================================
+CRV CONTROLE DE ACESSO — BACKEND FLASK v3.0
+DOCUMENTAÇÃO TÉCNICA COMPLETA
+================================================================================
+Data de geração: 2026-04-07
+Autor: Claude Sonnet 4.6 (Anthropic)
+================================================================================
+
+ÍNDICE
+------
+1.  Visão Geral da Arquitetura
+2.  Estrutura de Diretórios
+3.  Camada: config.py
+4.  Camada: views/
+5.  Camada: services/
+6.  Camada: auth/
+7.  Camada: middlewares/
+8.  Camada: controllers/
+9.  Camada: routes/
+10. Entry Point: app.py
+11. Dependências: requirements.txt
+12. Mapa de Endpoints da API
+13. Fluxo de uma Requisição (passo a passo)
+14. Segurança
+15. Como executar
+
+================================================================================
+1. VISÃO GERAL DA ARQUITETURA
+================================================================================
+
+O backend segue o padrão de arquitetura em camadas (Layered Architecture),
+onde cada camada tem uma responsabilidade única e se comunica apenas com a
+camada adjacente:
+
+  Requisição HTTP
+       ↓
+  [routes/]           — Define endpoints e aplica middlewares
+       ↓
+  [middlewares/]       — Valida JWT, verifica perfil, loga latência
+       ↓
+  [controllers/]       — Valida input, orquestra a resposta
+       ↓
+  [services/]          — Lógica de negócio e acesso ao Supabase
+       ↓
+  [SupabaseService]    — Cliente HTTP para a API REST do Supabase
+       ↓
+  Supabase (PostgreSQL + Auth)
+
+Tecnologias usadas:
+  - Flask 3.0.3              — Framework web Python
+  - Flask-CORS 4.0.0         — Cross-Origin Resource Sharing
+  - Flask-Limiter 3.5.0      — Rate limiting por IP
+  - python-dotenv 1.0.1      — Carregamento de variáveis .env
+  - urllib (stdlib)           — Cliente HTTP puro, sem dependências extras
+  - Supabase REST API         — Banco de dados PostgreSQL + Auth JWT
+
+================================================================================
+2. ESTRUTURA DE DIRETÓRIOS
+================================================================================
+
+crv-acesso/
+├── app.py                          ← Entry point (create_app factory)
+├── config.py                       ← Configurações centrais (.env)
+├── requirements.txt                ← Dependências Python
+├── BACKEND_DOCUMENTACAO.txt        ← Este arquivo
+│
+├── auth/
+│   ├── __init__.py
+│   └── supabase_auth.py            ← Validação de JWT via Supabase Auth
+│
+├── middlewares/
+│   ├── __init__.py
+│   ├── auth_middleware.py          ← Decoradores: requer_auth, requer_admin, etc.
+│   ├── permissao.py                ← Regras de negócio de autorização
+│   └── logger.py                  ← Logging estruturado + hooks de request
+│
+├── services/
+│   ├── __init__.py
+│   ├── supabase_service.py         ← Cliente HTTP base (GET/POST/PATCH/DELETE)
+│   ├── base_service.py             ← Classe pai com self.sb = SupabaseService()
+│   ├── auth_service.py             ← Login, logout, 2FA, recuperação de senha
+│   ├── usuarios_service.py         ← CRUD de usuários + Auth rollback
+│   ├── funcionarios_service.py     ← CRUD + importação em lote (50/batch)
+│   ├── equipamentos_service.py     ← CRUD + teste de conexão ao dispositivo
+│   ├── credenciais_service.py      ← CRUD de cartões, biometria, QR, PIN
+│   ├── ocorrencias_service.py      ← CRUD de incidentes de segurança
+│   ├── acessos_service.py          ← Log de passagens + stats do dia
+│   ├── auditoria_service.py        ← Log imutável (sempre service_role)
+│   ├── regras_acesso_service.py    ← CRUD de regras de acesso por horário
+│   └── configuracoes_service.py    ← Upsert de configurações globais
+│
+├── controllers/
+│   ├── __init__.py
+│   ├── base_controller.py          ← parse_json, parse_pagination, filtros
+│   ├── auth_controller.py          ← login, logout, me, senha, 2FA
+│   ├── usuarios_controller.py      ← CRUD usuários + verificação de permissão
+│   ├── funcionarios_controller.py  ← CRUD + importar()
+│   ├── equipamentos_controller.py  ← CRUD + testar_conexao()
+│   ├── credenciais_controller.py   ← CRUD credenciais
+│   ├── ocorrencias_controller.py   ← CRUD ocorrências
+│   ├── acessos_controller.py       ← Listar + registrar + stats_hoje
+│   ├── auditoria_controller.py     ← Listar (com verificação de perfil extra)
+│   ├── regras_acesso_controller.py ← CRUD regras (verifica pode_gerenciar_regras)
+│   ├── configuracoes_controller.py ← Buscar + salvar (verifica pode_alterar)
+│   ├── dashboard_controller.py     ← Agrega stats de múltiplos módulos
+│   └── exportar_controller.py      ← Gera CSV via Response streaming
+│
+├── routes/
+│   ├── __init__.py                 ← register_routes(app) — registra blueprints
+│   ├── auth_routes.py              ← Blueprint: /api/auth/...
+│   ├── usuarios_routes.py          ← Blueprint: /api/usuarios/...
+│   ├── funcionarios_routes.py      ← Blueprint: /api/funcionarios/...
+│   ├── equipamentos_routes.py      ← Blueprint: /api/equipamentos/...
+│   ├── credenciais_routes.py       ← Blueprint: /api/credenciais/...
+│   ├── ocorrencias_routes.py       ← Blueprint: /api/ocorrencias/...
+│   ├── acessos_routes.py           ← Blueprint: /api/acessos/...
+│   ├── auditoria_routes.py         ← Blueprint: /api/auditoria/...
+│   ├── regras_acesso_routes.py     ← Blueprint: /api/regras-acesso/...
+│   ├── configuracoes_routes.py     ← Blueprint: /api/configuracoes/...
+│   ├── dashboard_routes.py         ← Blueprint: /api/dashboard/...
+│   ├── exportar_routes.py          ← Blueprint: /api/exportar/...
+│   └── static_routes.py            ← Serve HTML/CSS/JS + /health
+│
+└── views/
+    ├── __init__.py
+    ├── response.py                 ← Fábrica de respostas JSON padronizadas
+    └── erros.py                    ← Handlers globais de erro HTTP
+
+================================================================================
+3. CAMADA: config.py
+================================================================================
+
+Carrega as variáveis de ambiente do arquivo .env e expõe como atributos de
+classe, disponíveis em todo o projeto via "from config import Config".
+
+Variáveis obrigatórias no .env:
+  SUPABASE_URL              URL do projeto Supabase (ex: https://xxx.supabase.co)
+  SUPABASE_ANON_KEY         Chave anon/public do Supabase
+  SUPABASE_SERVICE_ROLE_KEY Chave service_role (admin total, sem RLS)
+
+Variáveis opcionais (com defaults):
+  SECRET_KEY                Chave secreta Flask (default: crv-secret-dev-2025)
+  FLASK_DEBUG               true/false (default: false)
+  PORT                      Porta do servidor (default: 10000)
+  CORS_ORIGINS              IPs/domínios permitidos (vírgula separados)
+  RATE_LIMIT_DEFAULT        200 per minute
+  RATE_LIMIT_AUTH           10 per minute
+  RATE_LIMIT_SENSITIVE      5 per minute
+  RATE_LIMIT_EXPORT         20 per minute
+
+================================================================================
+4. CAMADA: views/
+================================================================================
+
+RESPONSE.PY
+-----------
+Define o formato padrão de todas as respostas JSON da API:
+
+  { "success": true/false, "data"/"error": ..., "message"?: ...,
+    "pagination"?: ..., "timestamp": "ISO8601" }
+
+Funções disponíveis:
+  success(data, message, status, pagination) → 200
+  created(data, message)                      → 201
+  no_content()                                → 204
+  paginated(data, total, page, per_page)      → 200 com metadados de paginação
+  error(message, status, detail, code)        → qualquer 4xx/5xx
+  bad_request(message, detail)                → 400
+  unauthorized(message)                       → 401
+  forbidden(message)                          → 403
+  not_found(resource)                         → 404
+  unprocessable(message, detail)              → 422
+  server_error(message, detail)               → 500
+
+ERROS.PY
+--------
+Registra handlers globais para Flask via register_error_handlers(app).
+Cobre os códigos: 400, 401, 403, 404, 405, 422, 429, 500.
+Garante que mesmo erros não tratados retornem JSON, nunca HTML.
+
+================================================================================
+5. CAMADA: services/
+================================================================================
+
+SUPABASE_SERVICE.PY
+-------------------
+Cliente HTTP de baixo nível para o Supabase REST API.
+Usa urllib da stdlib — sem dependências externas.
+
+Autenticação por header:
+  - Sem token: usa SUPABASE_SERVICE_ROLE_KEY → bypassa RLS (operações admin)
+  - Com token: usa SUPABASE_ANON_KEY + Bearer token do usuário → respeita RLS
+
+Métodos HTTP:
+  get(path, token)
+  post(path, payload, token, prefer)
+  patch(path, payload, token)
+  delete(path, token)
+
+Atalhos para tabelas REST:
+  select(tabela, filtros, select, order, limit, offset, token)
+  insert(tabela, payload, token)
+  update(tabela, filtro, payload, token)
+  remove(tabela, filtro, token)
+  count(tabela, filtros, token)
+
+BASE_SERVICE.PY
+---------------
+Classe pai de todos os services de domínio.
+Instancia self.sb = SupabaseService() automaticamente.
+
+AUTH_SERVICE.PY
+---------------
+Autentica usuários via Supabase Auth.
+Métodos:
+  login(email, senha)              → /auth/v1/token?grant_type=password
+  logout(token)                    → /auth/v1/logout
+  usuario_logado(token)            → /auth/v1/user
+  buscar_perfil_db(uid, token)     → tabela usuarios (verifica ativo=true)
+  recuperar_senha(email)           → /auth/v1/recover (sempre retorna sucesso)
+  alterar_senha_logado(token, pwd) → PATCH /auth/v1/user
+  enroll_2fa(token)                → /auth/v1/factors (TOTP)
+  challenge_2fa(token, factor_id)  → /auth/v1/factors/{id}/challenge
+  verify_2fa(token, fid, cid, cod) → /auth/v1/factors/{id}/verify + atualiza DB
+  unenroll_2fa(token, fid, uid)    → DELETE /auth/v1/factors/{id} + atualiza DB
+
+USUARIOS_SERVICE.PY
+-------------------
+CRUD completo de usuários do sistema (tabela `usuarios`).
+Métodos:
+  listar(token)
+  buscar(uid, token)
+  criar(dados, perfil_solicitante)  → cria no Auth primeiro, depois no DB.
+                                      Se DB falhar: rollback no Auth (delete).
+  atualizar(uid, dados, token)
+  alterar_senha(uid, nova_senha)    → PATCH /auth/v1/admin/users/{uid}
+  deletar(uid, solicitante_id)      → bloqueia auto-deleção
+
+FUNCIONARIOS_SERVICE.PY
+-----------------------
+CRUD + importação em lote de funcionários (tabela `funcionarios`).
+Campos aceitos: nome, cpf, matricula, cargo, status, setor, turno,
+                email, telefone, empresa_id
+Método importar(registros, token): lotes de 50 registros para evitar timeout.
+
+EQUIPAMENTOS_SERVICE.PY
+-----------------------
+CRUD de equipamentos (tabela `equipamentos`).
+Método testar_conexao(ip, porta, usuario, senha):
+  Faz POST HTTP para http://{ip}:{porta}/systemManager.fcgi?session=0
+  Retorna {"online": bool, "codigo_http": int} ou {"online": false, "erro": str}
+  Timeout: 5 segundos.
+
+CREDENCIAIS_SERVICE.PY
+----------------------
+CRUD de credenciais de acesso (tabela `credenciais`).
+Tipos: cartão, biometria, qrcode, pin
+Campos: funcionario_id, tipo, identificador, status, validade, empresa_id
+
+OCORRENCIAS_SERVICE.PY
+----------------------
+CRUD de incidentes de segurança (tabela `ocorrencias`).
+Campos: tipo, prioridade (alta/media/baixa), status (aberta/em_andamento/fechada),
+        descricao, local, funcionario_id, responsavel_id, data_ocorrencia
+
+ACESSOS_SERVICE.PY
+------------------
+Log de passagens (tabela `acessos`). Maioritariamente leitura.
+Método stats_hoje(token, data_ref):
+  Retorna {total, negados, liberados} para uma data específica.
+  Usa count() em vez de buscar registros completos — mais eficiente.
+
+AUDITORIA_SERVICE.PY
+--------------------
+Log imutável de ações sensíveis (tabela `auditoria`).
+SEMPRE usa service_role (sem token) para garantir que o log não passe por RLS.
+Níveis: info, aviso, critico
+Campos: usuario_id, usuario_email, acao, modulo, descricao, nivel, data, dados_extras
+
+REGRAS_ACESSO_SERVICE.PY
+------------------------
+CRUD de regras de controle de acesso (tabela `regras_acesso`).
+Campos: nome, descricao, equipamento_id, setor, cargo, turno,
+        horario_inicio, horario_fim, dias_semana, ativo, empresa_id
+
+CONFIGURACOES_SERVICE.PY
+------------------------
+Upsert de configurações globais (tabela `configuracoes`).
+Método salvar(dados, token, empresa_id):
+  Se já existe registro para empresa → PATCH.
+  Se não existe → INSERT.
+
+================================================================================
+6. CAMADA: auth/
+================================================================================
+
+SUPABASE_AUTH.PY
+----------------
+Funções puras para validação de token e busca de perfil.
+Usadas pelo middleware de autenticação.
+
+extrair_token(authorization_header)
+  → Extrai o Bearer token do header.
+  → Retorna (token, erro).
+
+validar_token(token)
+  → GET /auth/v1/user com o token.
+  → Retorna (auth_data, erro). auth_data contém id, email, role.
+
+buscar_perfil(user_id, token)
+  → SELECT na tabela usuarios para pegar perfil, ativo, empresa_id.
+  → Verifica se o usuário está ativo.
+  → Retorna (usuario_dict, erro).
+
+================================================================================
+7. CAMADA: middlewares/
+================================================================================
+
+AUTH_MIDDLEWARE.PY
+------------------
+Decoradores de autenticação para uso nas rotas.
+
+_autenticar()
+  Função interna. Chama extrair_token → validar_token → buscar_perfil.
+  Popula g.token, g.user_id, g.user_email, g.user_perfil, g.empresa_id.
+  Retorna (True, None) ou (False, response_401).
+
+@requer_auth
+  Exige apenas que o JWT seja válido. Qualquer perfil pode passar.
+  Popula g.* com dados do usuário.
+
+@requer_perfil("admin", "gerente")
+  Exige autenticação + pelo menos um dos perfis listados.
+
+@requer_admin
+  Atalho para requer_perfil("admin", "gerente").
+
+@somente_admin
+  Atalho para requer_perfil("admin").
+
+PERMISSAO.PY
+------------
+Funções puras de regras de negócio de autorização.
+Retornam sempre (bool, str_motivo).
+
+pode_criar_usuario(perfil_solicitante, perfil_alvo)
+  Admin cria qualquer perfil.
+  Gerente cria apenas operador e portaria.
+  Outros perfis não podem criar usuários.
+
+pode_editar_usuario(perfil_solicitante, perfil_alvo)
+  Mesma regra da criação.
+
+pode_excluir_usuario(perfil_solicitante, uid_solicitante, uid_alvo)
+  Somente admin pode excluir.
+  Ninguém pode excluir a si mesmo.
+
+pode_ver_auditoria(perfil)
+  Apenas admin e gerente.
+
+pode_alterar_configuracoes(perfil)
+  Apenas admin.
+
+pode_gerenciar_regras(perfil)
+  Admin e gerente.
+
+LOGGER.PY
+---------
+init_logger(app)
+  Configura logging.basicConfig com nível INFO (ou DEBUG se app.debug).
+  Silencia logs barulhentos de urllib3 e werkzeug.
+
+register_request_hooks(app)
+  @app.before_request: salva g._start = time.monotonic()
+  @app.after_request:
+    - Loga "METHOD /path → STATUS [Xms] uid=... ip=..."
+    - Adiciona headers de segurança: X-Content-Type-Options, X-Frame-Options,
+      Referrer-Policy
+    - Adiciona Cache-Control: no-store para /static/
+
+================================================================================
+8. CAMADA: controllers/
+================================================================================
+
+BASE_CONTROLLER.PY
+------------------
+Utilitários usados por todos os controllers.
+
+parse_json()             → request.get_json(force=True, silent=True) or {}
+parse_pagination()       → (limit, offset) da query string (max 500)
+parse_filtros_data(col)  → string de filtro "campo=gte.X&campo=lte.Y"
+sanitize(valor, maxlen)  → strip + truncate
+
+Cada controller segue o padrão:
+  1. Lê body/params via parse_json() ou request.args
+  2. Valida campos obrigatórios → retorna bad_request() se inválido
+  3. Verifica permissão via middlewares.permissao se necessário
+  4. Chama o service correspondente
+  5. Mapeia erro "not_found" → 404, outros erros → 422
+  6. Retorna success() / created() / no_content()
+
+================================================================================
+9. CAMADA: routes/
+================================================================================
+
+Cada arquivo cria um Flask Blueprint e define as rotas.
+Os decoradores de autenticação são aplicados diretamente nas funções de rota.
+
+Convenção de acesso por rota:
+  @requer_auth   — qualquer usuário autenticado pode acessar (GET/POST público)
+  @requer_admin  — apenas admin/gerente (operações de escrita sensíveis)
+  @somente_admin — somente admin (configurações críticas)
+
+ROUTES/__INIT__.PY
+------------------
+register_routes(app) importa e registra todos os 13 blueprints.
+
+================================================================================
+10. ENTRY POINT: app.py
+================================================================================
+
+Usa o padrão Application Factory (create_app()).
+Vantagens: facilita testes, múltiplas instâncias, configuração dinâmica.
+
+Ordem de inicialização dentro de create_app():
+  1. Flask(__name__, static_folder="static")
+  2. app.secret_key e app.debug do Config
+  3. init_logger(app)               ← configura logging
+  4. register_request_hooks(app)    ← before/after request
+  5. CORS(app, ...)                 ← restringe origens
+  6. Limiter(app, ...)              ← rate limiting global (200/min)
+  7. register_error_handlers(app)   ← handlers JSON globais
+  8. register_routes(app)           ← todos os blueprints
+
+O objeto `app` é criado no módulo para compatibilidade com gunicorn:
+  gunicorn app:app
+
+================================================================================
+11. DEPENDÊNCIAS: requirements.txt
+================================================================================
+
+flask==3.0.3             Framework web
+flask-cors==4.0.0        CORS
+flask-limiter==3.5.0     Rate limiting
+python-dotenv==1.0.1     Variáveis de ambiente
+bcrypt==4.1.2            Hashing (disponível para uso futuro)
+gunicorn==22.0.0         Servidor WSGI de produção
+
+Instalar: pip install -r requirements.txt
+
+================================================================================
+12. MAPA DE ENDPOINTS DA API
+================================================================================
+
+AUTENTICAÇÃO (/api/auth)
+  POST   /api/auth/login              — login (email + senha)
+  POST   /api/auth/logout             — logout (requer_auth)
+  GET    /api/auth/me                 — dados do usuário logado (requer_auth)
+  POST   /api/auth/recuperar-senha    — envia e-mail de recuperação
+  POST   /api/auth/alterar-senha      — altera senha do usuário logado
+  POST   /api/auth/2fa/enroll         — inicia cadastro de 2FA TOTP
+  POST   /api/auth/2fa/challenge      — cria desafio TOTP
+  POST   /api/auth/2fa/verify         — verifica código TOTP
+  POST   /api/auth/2fa/unenroll       — remove 2FA
+
+USUÁRIOS (/api/usuarios) — requer_admin
+  GET    /api/usuarios                — listar todos
+  GET    /api/usuarios/<uid>          — buscar por ID
+  POST   /api/usuarios                — criar usuário
+  PUT    /api/usuarios/<uid>          — atualizar
+  PUT    /api/usuarios/<uid>/senha    — alterar senha
+  DELETE /api/usuarios/<uid>          — deletar
+
+FUNCIONÁRIOS (/api/funcionarios)
+  GET    /api/funcionarios            — listar (requer_auth)
+  GET    /api/funcionarios/<fid>      — buscar (requer_auth)
+  POST   /api/funcionarios            — criar (requer_admin)
+  PUT    /api/funcionarios/<fid>      — atualizar (requer_admin)
+  DELETE /api/funcionarios/<fid>      — deletar (requer_admin)
+  POST   /api/funcionarios/importar   — importar lote CSV (requer_admin)
+
+EQUIPAMENTOS (/api/equipamentos)
+  GET    /api/equipamentos            — listar (requer_auth)
+  GET    /api/equipamentos/<eid>      — buscar (requer_auth)
+  POST   /api/equipamentos            — criar (requer_admin)
+  PUT    /api/equipamentos/<eid>      — atualizar (requer_admin)
+  DELETE /api/equipamentos/<eid>      — deletar (requer_admin)
+  POST   /api/equipamentos/testar-conexao — teste HTTP ao dispositivo
+
+CREDENCIAIS (/api/credenciais)
+  GET    /api/credenciais             — listar (requer_auth)
+  GET    /api/credenciais/<cid>       — buscar (requer_auth)
+  POST   /api/credenciais             — criar (requer_admin)
+  PUT    /api/credenciais/<cid>       — atualizar (requer_admin)
+  DELETE /api/credenciais/<cid>       — deletar (requer_admin)
+
+OCORRÊNCIAS (/api/ocorrencias)
+  GET    /api/ocorrencias             — listar (requer_auth)
+  GET    /api/ocorrencias/<oid>       — buscar (requer_auth)
+  POST   /api/ocorrencias             — criar (requer_auth)
+  PUT    /api/ocorrencias/<oid>       — atualizar (requer_auth)
+  DELETE /api/ocorrencias/<oid>       — deletar (requer_admin)
+
+ACESSOS (/api/acessos)
+  GET    /api/acessos                 — listar (requer_auth)
+  GET    /api/acessos/stats           — stats do dia atual (requer_auth)
+  GET    /api/acessos/<aid>           — buscar (requer_auth)
+  POST   /api/acessos                 — registrar evento (requer_auth)
+
+AUDITORIA (/api/auditoria) — requer_admin (admin/gerente)
+  GET    /api/auditoria               — listar log de auditoria
+
+REGRAS DE ACESSO (/api/regras-acesso)
+  GET    /api/regras-acesso           — listar (requer_auth)
+  GET    /api/regras-acesso/<rid>     — buscar (requer_auth)
+  POST   /api/regras-acesso           — criar (requer_auth + pode_gerenciar)
+  PUT    /api/regras-acesso/<rid>     — atualizar (requer_auth + pode_gerenciar)
+  DELETE /api/regras-acesso/<rid>     — deletar (requer_auth + pode_gerenciar)
+
+CONFIGURAÇÕES (/api/configuracoes)
+  GET    /api/configuracoes           — buscar (requer_auth)
+  POST   /api/configuracoes           — salvar (requer_auth + somente_admin)
+  PUT    /api/configuracoes           — salvar (requer_auth + somente_admin)
+
+DASHBOARD (/api/dashboard)
+  GET    /api/dashboard/stats         — agrega stats (requer_auth)
+
+EXPORTAÇÃO (/api/exportar)
+  GET    /api/exportar/<tabela>       — CSV download (requer_auth)
+  Tabelas: funcionarios, equipamentos, credenciais, ocorrencias, acessos, auditoria
+  Query params: data_ini=YYYY-MM-DD, data_fim=YYYY-MM-DD
+
+SISTEMA
+  GET    /health                      — health check (sem auth)
+  GET    /                            — dashboard.html
+  GET    /<path>                      — serve arquivos estáticos ou HTML
+
+================================================================================
+13. FLUXO DE UMA REQUISIÇÃO (passo a passo)
+================================================================================
+
+Exemplo: GET /api/funcionarios?status=ativo&limit=20
+
+1. Flask recebe a requisição na porta 10000
+
+2. register_request_hooks → before_request:
+   - Salva g._start = time.monotonic()
+
+3. Flask despacha para o Blueprint "funcionarios" (url_prefix="/api/funcionarios")
+
+4. Decorador @requer_auth na função listar():
+   - Extrai "Bearer <token>" do header Authorization
+   - GET /auth/v1/user com o token → Supabase retorna {id, email, ...}
+   - SELECT na tabela `usuarios` → retorna {perfil, ativo, empresa_id}
+   - Popula g.token, g.user_id, g.user_email, g.user_perfil, g.empresa_id
+
+5. Chama funcionarios_controller.listar():
+   - parse_pagination() → limit=20, offset=0
+   - _montar_filtros() → "status=eq.ativo"
+   - _svc.listar(token=g.token, filtros="status=eq.ativo")
+
+6. FuncionariosService.listar():
+   - self.sb.select("funcionarios", filtros="status=eq.ativo", order="nome.asc", token=token)
+
+7. SupabaseService.select():
+   - Monta path: /rest/v1/funcionarios?select=*&status=eq.ativo&order=nome.asc
+   - _headers(token=user_token) → usa anon key + Bearer token (respeita RLS)
+   - urllib.request.urlopen() → GET para Supabase
+   - Retorna (list[dict], None)
+
+8. Retorno sobe pelas camadas:
+   - Service retorna (data, None) ao controller
+   - Controller fatia data[0:20] para paginação, retorna success(pagina, pagination={...})
+   - success() retorna jsonify({success:true, data:[...], pagination:{...}, timestamp:...}), 200
+
+9. register_request_hooks → after_request:
+   - Loga "GET /api/funcionarios → 200 [42ms] uid=xxx ip=127.0.0.1"
+   - Adiciona headers de segurança à resposta
+
+10. Flask envia resposta HTTP 200 ao cliente
+
+================================================================================
+14. SEGURANÇA
+================================================================================
+
+AUTENTICAÇÃO
+  - JWT validado em cada requisição via Supabase /auth/v1/user
+  - Token nunca armazenado no servidor (stateless)
+  - Suporte a 2FA TOTP (Google Authenticator, Authy, etc.)
+
+AUTORIZAÇÃO
+  - Row Level Security (RLS) no Supabase ativo para operações com user token
+  - service_role usado apenas para operações admin críticas (criar user, auditoria)
+  - Hierarquia de perfis: admin > gerente > operador > portaria
+  - Regras em middlewares/permissao.py — funções puras, testáveis
+
+RATE LIMITING
+  - 200 requisições/minuto por IP (padrão global)
+  - Flask-Limiter com storage em memória (dev) ou Redis (prod)
+
+CORS
+  - Apenas origens explícitas via Config.CORS_ORIGINS
+  - Nunca wildcard (*)
+
+HEADERS DE SEGURANÇA (após cada resposta)
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - Referrer-Policy: strict-origin-when-cross-origin
+
+ROLLBACK DE AUTENTICAÇÃO
+  - Se criação de usuário falha no DB após criar no Auth:
+    DELETE /auth/v1/admin/users/{id} é chamado automaticamente
+
+PROTEÇÃO DE ROTAS
+  - Rotas GET de leitura: @requer_auth (qualquer usuário autenticado)
+  - Rotas de escrita (POST/PUT/DELETE): @requer_admin (admin/gerente)
+  - Rotas críticas (excluir usuário, config): @somente_admin
+
+================================================================================
+15. COMO EXECUTAR
+================================================================================
+
+REQUISITOS
+  - Python 3.10+
+  - Pip
+
+1. CRIAR AMBIENTE VIRTUAL
+   python -m venv venv
+   venv\Scripts\activate        (Windows)
+   source venv/bin/activate     (Linux/Mac)
+
+2. INSTALAR DEPENDÊNCIAS
+   pip install -r requirements.txt
+
+3. CRIAR ARQUIVO .env na pasta crv-acesso/
+   SUPABASE_URL=https://SEU_PROJETO.supabase.co
+   SUPABASE_ANON_KEY=eyJ...
+   SUPABASE_SERVICE_ROLE_KEY=eyJ...
+   SECRET_KEY=sua-chave-secreta-forte
+   FLASK_DEBUG=false
+   PORT=10000
+   CORS_ORIGINS=http://localhost:10000,http://127.0.0.1:10000
+
+4. EXECUTAR EM DESENVOLVIMENTO
+   python app.py
+
+5. EXECUTAR EM PRODUÇÃO (gunicorn)
+   gunicorn app:app --bind 0.0.0.0:10000 --workers 4
+
+6. VERIFICAR SAÚDE
+   GET http://localhost:10000/health
+   Resposta esperada: {"status": "ok", "supabase": "connected", ...}
+
+================================================================================
+TABELAS NECESSÁRIAS NO SUPABASE
+================================================================================
+
+As seguintes tabelas devem existir no Supabase antes de usar o backend:
+
+  usuarios        — id(uuid), nome, email, perfil, ativo, empresa_id, created_at
+  funcionarios    — id(uuid), nome, cpf, matricula, cargo, status, setor, turno,
+                    email, telefone, empresa_id, created_at
+  equipamentos    — id(uuid), nome, tipo, modelo, fabricante, ip, porta,
+                    localizacao, status, empresa_id, created_at
+  credenciais     — id(uuid), funcionario_id, tipo, identificador, status,
+                    validade, empresa_id, created_at
+  ocorrencias     — id(uuid), tipo, prioridade, status, descricao, local,
+                    funcionario_id, responsavel_id, data_ocorrencia, empresa_id, created_at
+  acessos         — id(uuid), funcionario_id, equipamento_id, credencial_id,
+                    tipo, metodo, resultado, motivo_negacao, data, empresa_id
+  auditoria       — id(uuid), usuario_id, usuario_email, acao, modulo,
+                    descricao, nivel, dados_extras, data
+  regras_acesso   — id(uuid), nome, descricao, equipamento_id, setor, cargo,
+                    turno, horario_inicio, horario_fim, dias_semana, ativo, empresa_id
+  configuracoes   — id(uuid), empresa_id, empresa_nome, empresa_cnpj, smtp_host,
+                    smtp_porta, smtp_usuario, smtp_ssl, notif_email, notif_whatsapp,
+                    notif_sistema, backup_automatico, backup_intervalo,
+                    tentativas_bloqueio, tempo_sessao, logo_url, tema
+
+================================================================================
+FIM DA DOCUMENTAÇÃO
+================================================================================

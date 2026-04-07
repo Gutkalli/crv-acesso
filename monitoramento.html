@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoramento — CRV Controle de Acesso</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/monitoramento.css">
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<!-- Cabeçalho -->
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Monitoramento</h2>
+    <p class="text-sm text-muted mt-1">Eventos ao vivo — atualização em tempo real</p>
+    <p class="text-sm text-muted mt-1">
+      Acompanhe em tempo real todas as entradas e saídas registradas pelos equipamentos de acesso.
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <div class="monitor-status-badge" id="ws-status">
+      <span class="monitor-pulse"></span>
+      <span id="ws-label">Conectado</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="btn-pausar">
+      <i class="ph ph-pause"></i> Pausar
+    </button>
+    <button class="btn btn-primary btn-sm">
+      <i class="ph ph-funnel"></i> Filtros
+    </button>
+  </div>
+</div>
+
+<!-- KPIs rápidos -->
+<div class="kpi-grid monitor-kpis">
+
+  <div class="kpi-card" style="border-top:3px solid var(--success);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Presentes agora</span>
+      <i class="ph ph-users kpi-icon" style="color:var(--success);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-presentes">--</div>
+    <div class="kpi-sub">funcionários no local</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--primary);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Eventos hoje</span>
+      <i class="ph ph-activity kpi-icon" style="color:var(--primary);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-eventos">--</div>
+    <div class="kpi-sub">entradas e saídas</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--danger);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Negados hoje</span>
+      <i class="ph ph-x-circle kpi-icon" style="color:var(--danger);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-negados">--</div>
+    <div class="kpi-sub">tentativas bloqueadas</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--warning);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Alertas ativos</span>
+      <i class="ph ph-warning kpi-icon" style="color:var(--warning);"></i>
+    </div>
+    <div class="kpi-value" id="kpi-alertas">--</div>
+    <div class="kpi-sub">aguardando ação</div>
+  </div>
+
+</div>
+
+    <!-- Grid principal -->
+    <div class="monitor-grid">
+
+      <!-- Feed ao vivo -->
+      <div class="card monitor-feed-card">
+        <div class="card-header">
+          <span class="card-title">
+            <i class="ph ph-broadcast"></i> Feed ao vivo
+          </span>
+          <div class="flex gap-2">
+            <select class="form-control" style="width:auto;font-size:0.78rem;" id="filtro-tipo">
+              <option value="">Todos os eventos</option>
+              <option value="liberado">Liberados</option>
+              <option value="negado">Negados</option>
+              <option value="alerta">Alertas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="monitor-feed" id="monitor-feed">
+          <!-- Eventos injetados via JS -->
+          <div class="monitor-empty">
+            <i class="ph ph-broadcast"></i>
+            <span>Aguardando eventos...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel direito -->
+      <div class="monitor-side">
+
+        <!-- Status catracas -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="ph ph-git-branch"></i> Catracas</span>
+            <span class="badge badge-success" id="badge-catracas">4/4 Online</span>
+          </div>
+          <div class="monitor-catracas" id="monitor-catracas">
+
+            <div class="catraca-item" data-id="1" data-bloqueada="false">
+              <div class="catraca-info">
+                <span class="catraca-dot online"></span>
+                <div>
+                  <div class="catraca-nome">Portão Principal — Entrada</div>
+                  <div class="catraca-meta">Último evento: agora</div>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                <button class="btn btn-ghost btn-sm btn-icon" title="Liberar passagem"><i class="ph ph-door-open"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Ver logs"><i class="ph ph-list-magnifying-glass"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Bloquear catraca"><i class="ph ph-lock-open"></i></button>
+              </div>
+            </div>
+
+            <div class="catraca-item" data-id="2" data-bloqueada="false">
+              <div class="catraca-info">
+                <span class="catraca-dot online"></span>
+                <div>
+                  <div class="catraca-nome">Portão Principal — Saída</div>
+                  <div class="catraca-meta">Último evento: 2min atrás</div>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                <button class="btn btn-ghost btn-sm btn-icon" title="Liberar passagem"><i class="ph ph-door-open"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Ver logs"><i class="ph ph-list-magnifying-glass"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Bloquear catraca"><i class="ph ph-lock-open"></i></button>
+              </div>
+            </div>
+
+            <div class="catraca-item" data-id="3" data-bloqueada="false">
+              <div class="catraca-info">
+                <span class="catraca-dot online"></span>
+                <div>
+                  <div class="catraca-nome">Portão Lateral A</div>
+                  <div class="catraca-meta">Último evento: 5min atrás</div>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                <button class="btn btn-ghost btn-sm btn-icon" title="Liberar passagem"><i class="ph ph-door-open"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Ver logs"><i class="ph ph-list-magnifying-glass"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Bloquear catraca"><i class="ph ph-lock-open"></i></button>
+              </div>
+            </div>
+
+            <div class="catraca-item" data-id="4" data-bloqueada="false">
+              <div class="catraca-info">
+                <span class="catraca-dot online"></span>
+                <div>
+                  <div class="catraca-nome">Portão Lateral B</div>
+                  <div class="catraca-meta">Último evento: 8min atrás</div>
+                </div>
+              </div>
+              <div class="flex gap-1">
+                <button class="btn btn-ghost btn-sm btn-icon" title="Liberar passagem"><i class="ph ph-door-open"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Ver logs"><i class="ph ph-list-magnifying-glass"></i></button>
+                <button class="btn btn-ghost btn-sm btn-icon" title="Bloquear catraca"><i class="ph ph-lock-open"></i></button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Último acesso destacado -->
+        <div class="card monitor-last-card" id="ultimo-acesso">
+          <div class="card-header">
+            <span class="card-title"><i class="ph ph-user-focus"></i> Último acesso</span>
+          </div>
+          <div class="monitor-last-empty" id="last-empty">
+            <i class="ph ph-user-circle"></i>
+            <span>Nenhum evento ainda</span>
+          </div>
+          <div class="monitor-last-content rec-hidden" id="last-content">
+            <div class="monitor-last-avatar" id="last-avatar">--</div>
+            <div class="monitor-last-info">
+              <div class="monitor-last-nome" id="last-nome">—</div>
+              <div class="monitor-last-meta" id="last-meta">—</div>
+              <div class="monitor-last-badges" id="last-badges"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal: Ver Logs da Catraca -->
+<div id="modal-logs" style="
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+">
+  <div style="
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    width:520px;max-width:94vw;max-height:85vh;
+    display:flex;flex-direction:column;overflow:hidden;
+    animation:modalIn .18s ease;
+  ">
+    <!-- Header -->
+    <div style="
+      background:linear-gradient(135deg,#6366f1,#4338ca);
+      padding:22px 24px 18px;
+      display:flex;align-items:flex-start;gap:14px;flex-shrink:0;
+    ">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="ph ph-list-magnifying-glass" style="font-size:1.3rem;color:#fff;"></i>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:2px;">Logs da Catraca</div>
+        <div id="modal-logs-nome" style="font-size:0.82rem;color:rgba(255,255,255,0.75);"></div>
+      </div>
+      <button id="btn-logs-fechar" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <!-- Filtro rápido -->
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center;">
+      <span style="font-size:0.78rem;color:var(--text-muted);white-space:nowrap;">Filtrar:</span>
+      <button class="log-filtro-btn active" data-filtro="todos" style="font-size:0.75rem;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:var(--primary);color:#fff;cursor:pointer;">Todos</button>
+      <button class="log-filtro-btn" data-filtro="liberado" style="font-size:0.75rem;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">Liberado</button>
+      <button class="log-filtro-btn" data-filtro="negado" style="font-size:0.75rem;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;">Negado</button>
+    </div>
+
+    <!-- Lista de logs -->
+    <div id="modal-logs-lista" style="flex:1;overflow-y:auto;padding:12px 20px 0;"></div>
+
+    <!-- Rodapé -->
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;flex-shrink:0;">
+      <button id="btn-logs-fechar2" class="btn btn-ghost">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Bloquear / Ativar Catraca -->
+<div id="modal-bloquear" style="
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+">
+  <div style="
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    width:420px;max-width:92vw;overflow:hidden;
+    animation:modalIn .18s ease;
+  ">
+    <!-- Header -->
+    <div id="modal-bloquear-header" style="padding:24px 24px 20px;display:flex;align-items:flex-start;gap:14px;">
+      <div id="modal-bloquear-icon" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="ph ph-lock" style="font-size:1.4rem;color:#fff;"></i>
+      </div>
+      <div>
+        <div id="modal-bloquear-titulo" style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:3px;"></div>
+        <div id="modal-bloquear-nome" style="font-size:0.83rem;color:rgba(255,255,255,0.75);"></div>
+      </div>
+    </div>
+    <!-- Corpo -->
+    <div style="padding:4px 24px 20px;">
+      <p id="modal-bloquear-desc" style="font-size:0.88rem;color:var(--text-primary);margin:0 0 6px;"></p>
+      <p id="modal-bloquear-sub" style="font-size:0.82rem;color:var(--text-muted);margin:0 0 16px;"></p>
+      <div id="modal-bloquear-aviso" style="
+        padding:10px 14px;border-radius:8px;
+        display:flex;align-items:center;gap:8px;
+        font-size:0.81rem;
+      "></div>
+    </div>
+    <!-- Rodapé -->
+    <div style="padding:14px 24px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);">
+      <button id="btn-bloquear-cancelar" class="btn btn-ghost">Cancelar</button>
+      <button id="btn-bloquear-confirmar" class="btn btn-primary"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Liberar Passagem -->
+<div id="modal-liberar" style="
+  display:none;
+  position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+">
+  <div style="
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    width:420px;max-width:92vw;
+    overflow:hidden;
+    animation:modalIn .18s ease;
+  ">
+
+    <!-- Topo colorido -->
+    <div style="
+      background:linear-gradient(135deg,var(--primary),#0369a1);
+      padding:24px 24px 20px;
+      display:flex;align-items:flex-start;gap:14px;
+    ">
+      <div style="
+        width:44px;height:44px;border-radius:50%;
+        background:rgba(255,255,255,0.15);
+        display:flex;align-items:center;justify-content:center;
+        flex-shrink:0;
+      ">
+        <i class="ph ph-door-open" style="font-size:1.4rem;color:#fff;"></i>
+      </div>
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:3px;">Liberar Passagem</div>
+        <div id="modal-liberar-nome" style="font-size:0.83rem;color:rgba(255,255,255,0.75);"></div>
+      </div>
+    </div>
+
+    <!-- Corpo -->
+    <div style="padding:22px 24px;">
+      <p style="font-size:0.88rem;color:var(--text-primary);margin:0 0 6px;">
+        Confirma a liberação remota desta catraca?
+      </p>
+      <p style="font-size:0.82rem;color:var(--text-muted);margin:0;">
+        O equipamento receberá o comando de abertura imediatamente. A ação será registrada na auditoria.
+      </p>
+
+      <!-- Aviso destaque -->
+      <div style="
+        margin-top:16px;
+        padding:10px 14px;
+        background:rgba(245,158,11,0.1);
+        border:1px solid rgba(245,158,11,0.35);
+        border-radius:8px;
+        display:flex;align-items:center;gap:8px;
+        font-size:0.81rem;color:var(--warning);
+      ">
+        <i class="ph ph-warning" style="font-size:1rem;flex-shrink:0;"></i>
+        Certifique-se de que a liberação é autorizada antes de confirmar.
+      </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div style="
+      padding:14px 24px 20px;
+      display:flex;gap:10px;justify-content:flex-end;
+      border-top:1px solid var(--border);
+    ">
+      <button id="btn-liberar-cancelar" class="btn btn-ghost">
+        Cancelar
+      </button>
+      <button id="btn-liberar-confirmar" class="btn btn-primary">
+        <i class="ph ph-door-open"></i> Liberar agora
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@keyframes modalIn {
+  from { opacity:0; transform:scale(.95) translateY(8px); }
+  to   { opacity:1; transform:scale(1)  translateY(0);    }
+}
+</style>
+
+<script src="static/js/vendor/supabase.min.js"></script>
+
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/api.js"></script>
+<script src="static/js/core/db.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/core/sync.js"></script>
+<script src="static/js/core/session.js"></script>
+
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/monitoramento.js"></script>
+
+</body>
+</html>

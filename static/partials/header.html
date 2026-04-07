@@ -1,0 +1,35 @@
+<header class="header" id="header">
+  <div class="header-left">
+    <button class="header-btn" id="hamburger-btn" title="Recolher menu">
+      <i class="ph ph-list"></i>
+    </button>
+    <img src="static/img/logo-cliente1.png"
+     alt="Logo Cliente"
+     class="header-logo-cliente"
+     id="logo-cliente"
+     data-logo-empresa
+     data-default-src="static/img/logo-cliente1.png">
+    <div class="header-divider"></div>
+  </div>
+
+  <div class="header-right">
+    <span class="header-clock" id="header-clock">00:00:00</span>
+
+    <button class="header-btn" id="theme-toggle" title="Alternar tema">
+      <i class="ph ph-moon" id="theme-icon"></i>
+    </button>
+
+    <button class="header-btn" id="btn-notificacoes" title="Notificações" style="position:relative;">
+      <i class="ph ph-bell"></i>
+      <span id="notif-badge" style="
+        position:absolute; top:4px; right:4px;
+        width:8px; height:8px; border-radius:50%;
+        background:var(--danger);
+        border:2px solid var(--header-bg);
+        display:none;
+      "></span>
+    </button>
+
+    <div class="header-avatar" id="user-avatar" title="Meu perfil">VS</div>
+  </div>
+</header>

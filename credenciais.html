@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credenciais — CRV Controle de Acesso</title>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="static/css/main.css">
+  <link rel="stylesheet" href="static/css/credenciais.css">
+  <script src="static/js/vendor/supabase.min.js"></script>
+</head>
+<body>
+
+<div class="app-wrapper" id="app-wrapper">
+  <div id="sidebar-container"></div>
+  <div id="header-container"></div>
+
+  <main class="main-content">
+
+<!-- Cabeçalho -->
+<div class="page-header">
+  <div>
+    <h2 class="page-title">Credenciais</h2>
+    <p class="text-sm text-muted mt-1">Gestão de cartões, senhas e biometrias</p>
+    <p class="text-sm text-muted mt-1">
+      Cadastre e gerencie os meios de acesso de cada funcionário: cartões, senhas e biometrias.
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <button class="btn btn-ghost btn-sm" id="btn-cred-exportar">
+      <i class="ph ph-download-simple"></i> Exportar
+    </button>
+    <button class="btn btn-primary btn-sm" id="btn-nova">
+      <i class="ph ph-plus"></i> Nova Credencial
+    </button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px;">
+
+  <div class="kpi-card" style="border-top:3px solid var(--primary);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Total</span>
+      <i class="ph ph-key kpi-icon" style="color:var(--primary);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">credenciais cadastradas</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--success);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Cartões ativos</span>
+      <i class="ph ph-credit-card kpi-icon" style="color:var(--success);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">em uso</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--warning);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Biometrias</span>
+      <i class="ph ph-fingerprint kpi-icon" style="color:var(--warning);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">digitais + facial</div>
+  </div>
+
+  <div class="kpi-card" style="border-top:3px solid var(--danger);">
+    <div class="flex items-center justify-between">
+      <span class="kpi-label">Bloqueadas</span>
+      <i class="ph ph-lock kpi-icon" style="color:var(--danger);"></i>
+    </div>
+    <div class="kpi-value">—</div>
+    <div class="kpi-sub">credenciais suspensas</div>
+  </div>
+
+</div>
+
+    <!-- Abas por tipo -->
+    <div class="cred-tabs">
+      <button class="cred-tab active" data-tab="todas">
+        <i class="ph ph-key"></i> Todas
+      </button>
+      <button class="cred-tab" data-tab="cartao">
+        <i class="ph ph-credit-card"></i> Cartão
+      </button>
+      <button class="cred-tab" data-tab="biometria">
+        <i class="ph ph-fingerprint"></i> Biometria
+      </button>
+      <button class="cred-tab" data-tab="facial">
+        <i class="ph ph-scan"></i> Facial
+      </button>
+      <button class="cred-tab" data-tab="senha">
+        <i class="ph ph-lock-key"></i> Senha
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+      <div class="func-filtros">
+        <div class="input-icon-wrap func-busca">
+          <i class="ph ph-magnifying-glass input-icon"></i>
+          <input type="text" class="form-control" placeholder="Buscar por funcionário, matrícula ou número do cartão...">
+        </div>
+        <select class="form-control func-select">
+          <option value="">Todos os status</option>
+          <option>Ativa</option>
+          <option>Bloqueada</option>
+          <option>Expirada</option>
+          <option>Pendente</option>
+        </select>
+        <select class="form-control func-select">
+          <option value="">Todos os setores</option>
+          <option>Operações</option>
+          <option>Administrativo</option>
+          <option>TI</option>
+          <option>RH</option>
+          <option>Financeiro</option>
+          <option>Segurança</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabela / Estado vazio -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="ph ph-table"></i> Lista de Credenciais</span>
+        <span class="text-sm text-muted">0 registros</span>
+      </div>
+
+      <!-- Estado vazio -->
+      <div class="func-empty" id="cred-empty">
+        <i class="ph ph-key"></i>
+        <h3>Nenhuma credencial cadastrada</h3>
+        <p>As credenciais são vinculadas aos funcionários. Cadastre um funcionário primeiro ou adicione uma credencial manualmente.</p>
+        <div class="flex gap-2 justify-center mt-4">
+          <button class="btn btn-primary" id="btn-nova-empty">
+            <i class="ph ph-plus"></i> Nova Credencial
+          </button>
+          <button class="btn btn-ghost" data-href="funcionarios">
+            <i class="ph ph-users"></i> Ver Funcionários
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabela (oculta até ter dados) -->
+      <div class="table-wrapper func-table-hidden" id="cred-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Funcionário</th>
+              <th>Tipo</th>
+              <th>Identificador</th>
+              <th>Emissão</th>
+              <th>Validade</th>
+              <th>Status</th>
+              <th style="width:120px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="cred-tbody">
+            <!-- Linhas injetadas via backend -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal: Nova / Editar Credencial -->
+<div class="modal-overlay func-table-hidden" id="modal-credencial">
+  <div class="func-modal" style="max-width:680px;">
+
+    <button class="func-modal-close" id="cred-modal-fechar">
+      <i class="ph ph-x"></i>
+    </button>
+
+    <div class="func-modal-title">
+      <i class="ph ph-key"></i>
+      <span id="modal-titulo">Nova Credencial</span>
+    </div>
+
+    <!-- Funcionário -->
+    <div class="form-group">
+      <label class="form-label">Funcionário <span class="form-required">*</span></label>
+      <div class="input-icon-wrap">
+        <i class="ph ph-user input-icon"></i>
+        <select id="cred-funcionario" class="form-control">
+        <option value="">Selecione o funcionário...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tipo -->
+    <div class="form-group">
+      <label class="form-label">Tipo de credencial <span class="form-required">*</span></label>
+      <div class="cred-tipo-grid" id="cred-tipo-grid">
+        <div class="cred-tipo-item" data-tipo="cartao">
+          <i class="ph ph-credit-card"></i>
+          <span>Cartão</span>
+        </div>
+        <div class="cred-tipo-item" data-tipo="biometria">
+          <i class="ph ph-fingerprint"></i>
+          <span>Digital</span>
+        </div>
+        <div class="cred-tipo-item" data-tipo="facial">
+          <i class="ph ph-scan"></i>
+          <span>Facial</span>
+        </div>
+        <div class="cred-tipo-item" data-tipo="senha">
+          <i class="ph ph-lock-key"></i>
+          <span>Senha</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos: Cartão -->
+    <div id="cred-campos-cartao" class="func-table-hidden">
+      <div class="modal-section-title">Dados do Cartão</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Número do cartão</label>
+          <input type="text" class="form-control" id="cred-num-cartao" placeholder="Ex: 0A1B2C3D">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Validade</label>
+          <input type="date" class="form-control" id="cred-validade">
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos: Senha -->
+    <div id="cred-campos-senha" class="func-table-hidden">
+      <div class="modal-section-title">Configuração de Senha</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" class="form-control" id="cred-senha" placeholder="••••••">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar senha</label>
+          <input type="password" class="form-control" id="cred-senha-conf" placeholder="••••••">
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos: Biometria / Facial -->
+    <div id="cred-campos-bio" class="func-table-hidden">
+      <div class="modal-section-title">Biometria</div>
+      <div class="cred-bio-aviso">
+        <i class="ph ph-info"></i>
+        <span>O cadastro biométrico é realizado diretamente no equipamento Control iD. Salve a credencial e siga as instruções no dispositivo.</span>
+      </div>
+    </div>
+
+    <!-- Status + Observação -->
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" id="cred-status">
+          <option value="ativa">Ativa</option>
+          <option value="bloqueada">Bloqueada</option>
+          <option value="pendente">Pendente</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observação</label>
+        <input type="text" class="form-control" id="cred-obs" placeholder="Opcional">
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cred-btn-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="cred-btn-salvar">
+        <i class="ph ph-floppy-disk"></i> Salvar
+      </button>
+    </div>
+
+  </div><!-- fecha .func-modal -->
+</div><!-- fecha .modal-overlay -->
+
+<script src="static/js/core/supabase.js"></script>
+<script src="static/js/core/network.js"></script>
+<script src="static/js/auth.js"></script>
+<script src="static/js/main.js"></script>
+<script src="static/js/lgpd.js"></script>
+<script src="static/js/credenciais.js"></script>
+</body>
+</html>
