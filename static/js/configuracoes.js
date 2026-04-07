@@ -639,45 +639,68 @@ function initAvancado() {
    AÇÕES DO CABEÇALHO
    ===================================================== */
 
+/* Mapa: seção do menu → chave no banco + label amigável + campos a limpar */
+const CFG_SECAO_MAP = {
+  geral:        { chave: 'empresa',       label: 'Geral (Informações da Empresa)',  limpar: ['cfg-empresa-nome','cfg-empresa-cnpj','cfg-empresa-endereco','cfg-empresa-tel'] },
+  aparencia:    { chave: 'aparencia',     label: 'Aparência',                       limpar: [] },
+  seguranca:    { chave: 'seguranca',     label: 'Segurança',                       limpar: [] },
+  notificacoes: { chave: 'notificacoes',  label: 'Notificações',                    limpar: ['cfg-email-notif','cfg-email-cc'] },
+  integracao:   { chave: 'integracao',    label: 'Integração',                      limpar: ['cfg-api-url','cfg-api-porta','cfg-api-usuario'] },
+  backup:       { chave: 'backup',        label: 'Backup',                          limpar: [] },
+};
+
 function initAcoesCabecalho() {
 
-  // Botão salvar — verifica se já existe dado salvo e exibe confirmação
+  // ── Botão Salvar ──────────────────────────────────────────────
   document.getElementById('btn-cfg-salvar')?.addEventListener('click', async () => {
     const supabase = getSupabaseInstance();
     if (!supabase) { salvarConfiguracoes(); return; }
 
+    // Descobre qual seção está ativa no menu lateral
+    const secaoAtiva = document.querySelector('.cfg-nav-item.active')?.dataset.secao || 'geral';
+    const secaoCfg   = CFG_SECAO_MAP[secaoAtiva];
+
+    // Seções sem chave no banco (Usuários, Avançado) salvam direto
+    if (!secaoCfg) { salvarConfiguracoes(); return; }
+
+    // Verifica se já existe dado salvo PARA ESTA SEÇÃO
     const { data } = await supabase
       .from('configuracoes')
       .select('chave')
+      .eq('chave', secaoCfg.chave)
       .limit(1);
 
     const jaExiste = data && data.length > 0;
 
     if (jaExiste) {
-      // Mostra modal de confirmação
-      const modal = document.getElementById('modal-confirmar-salvar');
-      modal.classList.remove('cfg-hidden');
+      // Atualiza modal com contexto da seção atual
+      const descEl = document.getElementById('modal-confirmar-desc');
+      if (descEl) descEl.innerHTML =
+        `Já existe configuração salva em <strong>${secaoCfg.label}</strong>.<br>O que deseja fazer?`;
 
-      // Botão "Excluir" só aparece para ADM
-      const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
-      const isAdmin = usuario.perfil === 'admin';
       const btnExcluir = document.getElementById('btn-confirmar-excluir');
-      if (btnExcluir) btnExcluir.style.display = isAdmin ? '' : 'none';
+      if (btnExcluir) {
+        // Só admin vê o botão de excluir
+        const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
+        btnExcluir.style.display = usuario.perfil === 'admin' ? '' : 'none';
+        btnExcluir.dataset.secao = secaoAtiva; // guarda contexto para o clique
+      }
+
+      document.getElementById('modal-confirmar-salvar').classList.remove('cfg-hidden');
     } else {
-      // Primeiro salvamento — vai direto
+      // Primeiro salvamento desta seção — vai direto
       salvarConfiguracoes();
     }
   });
 
-  // Modal confirmação — botão Atualizar
+  // ── Modal: Atualizar ──────────────────────────────────────────
   document.getElementById('btn-confirmar-atualizar')?.addEventListener('click', () => {
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
     salvarConfiguracoes();
   });
 
-  // Modal confirmação — botão Excluir (só ADM, só dados da empresa/geral)
+  // ── Modal: Excluir dados da seção (somente ADM) ───────────────
   document.getElementById('btn-confirmar-excluir')?.addEventListener('click', async () => {
-    // Dupla verificação de permissão
     const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
     if (usuario.perfil !== 'admin') {
       mostrarToast('Apenas administradores podem excluir configurações.', 'error');
@@ -685,35 +708,38 @@ function initAcoesCabecalho() {
       return;
     }
 
+    const secaoAtiva = document.getElementById('btn-confirmar-excluir').dataset.secao || 'geral';
+    const secaoCfg   = CFG_SECAO_MAP[secaoAtiva];
+    if (!secaoCfg) return;
+
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
+
     const supabase = getSupabaseInstance();
     if (!supabase) return;
 
-    // Apaga APENAS o grupo 'empresa' — demais configurações são preservadas
+    // Apaga SOMENTE a chave da seção atual — todo o resto fica intacto
     const { error } = await supabase
       .from('configuracoes')
       .delete()
-      .eq('chave', 'empresa');
+      .eq('chave', secaoCfg.chave);
 
     if (error) {
-      mostrarToast('Erro ao excluir dados da empresa.', 'error');
+      mostrarToast(`Erro ao excluir dados de ${secaoCfg.label}.`, 'error');
       return;
     }
 
-    // Limpa os campos do formulário de empresa
-    setVal('cfg-empresa-nome', '');
-    setVal('cfg-empresa-cnpj', '');
-    setVal('cfg-empresa-endereco', '');
-    setVal('cfg-empresa-tel', '');
+    // Limpa os campos do formulário correspondentes
+    secaoCfg.limpar.forEach(id => setVal(id, ''));
 
-    mostrarToast('Dados da empresa excluídos com sucesso.', 'success');
+    mostrarToast(`Dados de ${secaoCfg.label} excluídos com sucesso.`, 'success');
   });
 
-  // Modal confirmação — botão Cancelar
+  // ── Modal: Cancelar ───────────────────────────────────────────
   document.getElementById('btn-confirmar-cancelar')?.addEventListener('click', () => {
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
   });
 
+  // ── Restaurar padrões ─────────────────────────────────────────
   document.getElementById('btn-cfg-restaurar')?.addEventListener('click', () => {
     const ok = confirm('Deseja restaurar todas as configurações para os valores padrão?');
     if (!ok) return;

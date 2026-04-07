@@ -779,17 +779,16 @@
         Configurações já cadastradas
       </h3>
     </div>
-    <p style="margin-top:16px;font-size:0.88rem;color:var(--text-muted);line-height:1.7;">
-      Já existem informações da empresa cadastradas no sistema.<br>
-      O que deseja fazer?
+    <p id="modal-confirmar-desc" style="margin-top:16px;font-size:0.88rem;color:var(--text-muted);line-height:1.7;">
+      Já existe configuração salva nesta seção.<br>O que deseja fazer?
     </p>
-    <div class="modal-footer" style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;">
+    <div class="modal-footer" style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn btn-ghost" id="btn-confirmar-cancelar">
         <i class="ph ph-x"></i> Cancelar
       </button>
-      <!-- Visível apenas para ADM — apaga só os dados da empresa -->
+      <!-- Visível apenas para ADM — apaga só os dados da seção atual -->
       <button class="btn btn-ghost" id="btn-confirmar-excluir" style="color:var(--danger);border-color:var(--danger);display:none;">
-        <i class="ph ph-trash"></i> Excluir dados da empresa
+        <i class="ph ph-trash"></i> Excluir dados desta seção
       </button>
       <button class="btn btn-primary" id="btn-confirmar-atualizar">
         <i class="ph ph-pencil-simple"></i> Atualizar
