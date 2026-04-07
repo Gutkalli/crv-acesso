@@ -655,7 +655,14 @@ function initAcoesCabecalho() {
 
     if (jaExiste) {
       // Mostra modal de confirmação
-      document.getElementById('modal-confirmar-salvar').classList.remove('cfg-hidden');
+      const modal = document.getElementById('modal-confirmar-salvar');
+      modal.classList.remove('cfg-hidden');
+
+      // Botão "Excluir" só aparece para ADM
+      const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
+      const isAdmin = usuario.perfil === 'admin';
+      const btnExcluir = document.getElementById('btn-confirmar-excluir');
+      if (btnExcluir) btnExcluir.style.display = isAdmin ? '' : 'none';
     } else {
       // Primeiro salvamento — vai direto
       salvarConfiguracoes();
@@ -668,14 +675,38 @@ function initAcoesCabecalho() {
     salvarConfiguracoes();
   });
 
-  // Modal confirmação — botão Excluir tudo
+  // Modal confirmação — botão Excluir (só ADM, só dados da empresa/geral)
   document.getElementById('btn-confirmar-excluir')?.addEventListener('click', async () => {
+    // Dupla verificação de permissão
+    const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
+    if (usuario.perfil !== 'admin') {
+      mostrarToast('Apenas administradores podem excluir configurações.', 'error');
+      document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
+      return;
+    }
+
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
     const supabase = getSupabaseInstance();
     if (!supabase) return;
-    await supabase.from('configuracoes').delete().neq('chave', '');
-    mostrarToast('Configurações excluídas. Salvando valores atuais...', 'info');
-    setTimeout(() => salvarConfiguracoes(), 600);
+
+    // Apaga APENAS o grupo 'empresa' — demais configurações são preservadas
+    const { error } = await supabase
+      .from('configuracoes')
+      .delete()
+      .eq('chave', 'empresa');
+
+    if (error) {
+      mostrarToast('Erro ao excluir dados da empresa.', 'error');
+      return;
+    }
+
+    // Limpa os campos do formulário de empresa
+    setVal('cfg-empresa-nome', '');
+    setVal('cfg-empresa-cnpj', '');
+    setVal('cfg-empresa-endereco', '');
+    setVal('cfg-empresa-tel', '');
+
+    mostrarToast('Dados da empresa excluídos com sucesso.', 'success');
   });
 
   // Modal confirmação — botão Cancelar
