@@ -616,6 +616,43 @@ KPIs
 }
 
 /* =====================================================
+   RODAPÉ DE SEÇÃO — botões salvar/restaurar por seção
+   ===================================================== */
+
+.cfg-secao-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.cfg-secao-erro {
+  font-size: 0.82rem;
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-height: 18px;
+}
+
+.cfg-secao-erro:not(:empty)::before {
+  content: '\e95b'; /* ícone ph-warning-circle via font */
+  font-family: 'Phosphor';
+  font-size: 0.95rem;
+}
+
+.cfg-secao-footer-acoes {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* =====================================================
    RESPONSIVO
    ===================================================== */
 

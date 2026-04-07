@@ -24,14 +24,7 @@
       Personalize o sistema, gerencie usuários, integrações, segurança e backup.
     </p>
   </div>
-      <div class="page-actions">
-        <button class="btn btn-ghost btn-sm" id="btn-cfg-restaurar">
-          <i class="ph ph-arrow-counter-clockwise"></i> Restaurar padrões
-        </button>
-        <button class="btn btn-primary btn-sm" id="btn-cfg-salvar">
-          <i class="ph ph-floppy-disk"></i> Salvar alterações
-        </button>
-      </div>
+      <!-- botões globais removidos — cada seção tem o seu próprio -->
     </div>
 
     <div class="cfg-layout">
@@ -194,6 +187,19 @@
             </div>
           </div>
 
+          <!-- Rodapé Geral -->
+          <div class="cfg-secao-footer">
+            <p class="cfg-secao-erro" id="erro-geral"></p>
+            <div class="cfg-secao-footer-acoes">
+              <button class="btn btn-ghost btn-sm" data-restaurar="geral">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+              </button>
+              <button class="btn btn-primary btn-sm" data-salvar="geral">
+                <i class="ph ph-floppy-disk"></i> Salvar
+              </button>
+            </div>
+          </div>
+
         </section>
 
         <!-- ==================== APARÊNCIA ==================== -->
@@ -300,6 +306,19 @@
             </div>
           </div>
 
+          <!-- Rodapé Aparência -->
+          <div class="cfg-secao-footer">
+            <p class="cfg-secao-erro" id="erro-aparencia"></p>
+            <div class="cfg-secao-footer-acoes">
+              <button class="btn btn-ghost btn-sm" data-restaurar="aparencia">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+              </button>
+              <button class="btn btn-primary btn-sm" data-salvar="aparencia">
+                <i class="ph ph-floppy-disk"></i> Salvar
+              </button>
+            </div>
+          </div>
+
         </section>
 
         <!-- ==================== SEGURANÇA ==================== -->
@@ -381,6 +400,19 @@
             </div>
           </div>
 
+          <!-- Rodapé Segurança -->
+          <div class="cfg-secao-footer">
+            <p class="cfg-secao-erro" id="erro-seguranca"></p>
+            <div class="cfg-secao-footer-acoes">
+              <button class="btn btn-ghost btn-sm" data-restaurar="seguranca">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+              </button>
+              <button class="btn btn-primary btn-sm" data-salvar="seguranca">
+                <i class="ph ph-floppy-disk"></i> Salvar
+              </button>
+            </div>
+          </div>
+
         </section>
 
         <!-- ==================== NOTIFICAÇÕES ==================== -->
@@ -450,6 +482,19 @@
                 </label>
               </div>
 
+            </div>
+          </div>
+
+          <!-- Rodapé Notificações -->
+          <div class="cfg-secao-footer">
+            <p class="cfg-secao-erro" id="erro-notificacoes"></p>
+            <div class="cfg-secao-footer-acoes">
+              <button class="btn btn-ghost btn-sm" data-restaurar="notificacoes">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+              </button>
+              <button class="btn btn-primary btn-sm" data-salvar="notificacoes">
+                <i class="ph ph-floppy-disk"></i> Salvar
+              </button>
             </div>
           </div>
 
@@ -525,6 +570,19 @@
                 </select>
               </div>
 
+            </div>
+          </div>
+
+          <!-- Rodapé Integração -->
+          <div class="cfg-secao-footer">
+            <p class="cfg-secao-erro" id="erro-integracao"></p>
+            <div class="cfg-secao-footer-acoes">
+              <button class="btn btn-ghost btn-sm" data-restaurar="integracao">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+              </button>
+              <button class="btn btn-primary btn-sm" data-salvar="integracao">
+                <i class="ph ph-floppy-disk"></i> Salvar
+              </button>
             </div>
           </div>
 
@@ -636,6 +694,19 @@
             </div>
             <div class="cfg-backup-ultimo text-sm text-muted mt-3" id="cfg-backup-ultimo">
               <i class="ph ph-clock"></i> Último backup: —
+            </div>
+          </div>
+
+          <!-- Rodapé Backup -->
+          <div class="cfg-secao-footer">
+            <p class="cfg-secao-erro" id="erro-backup"></p>
+            <div class="cfg-secao-footer-acoes">
+              <button class="btn btn-ghost btn-sm" data-restaurar="backup">
+                <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+              </button>
+              <button class="btn btn-primary btn-sm" data-salvar="backup">
+                <i class="ph ph-floppy-disk"></i> Salvar
+              </button>
             </div>
           </div>
 
