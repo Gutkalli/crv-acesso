@@ -58,10 +58,9 @@ async function loadPartials() {
     sidebarContainer.innerHTML = await sidebarRes.text();
     headerContainer.innerHTML  = await headerRes.text();
 
-    // Aplica restrições de perfil nos itens do sidebar (data-permissao="admin" etc.)
-    if (window.permissoesCRV?.aplicarPermissoesUI) {
-      window.permissoesCRV.aplicarPermissoesUI();
-    }
+    // Garante que permissoes.js está carregado e aplica restrições no sidebar
+    await carregarPermissoes();
+    window.permissoesCRV?.aplicarPermissoesUI();
   } catch (e) {
     console.warn('Erro ao carregar partials:', e);
   }
