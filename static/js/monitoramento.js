@@ -223,21 +223,18 @@ const Monitoramento = (() => {
         dot.className = `catraca-dot ${novoBloqueada ? 'offline' : 'online'}`;
       }
       if (btnLk) {
-        btnLk.title   = novoBloqueada ? 'Ativar catraca' : 'Bloquear catraca';
+        btnLk.title     = novoBloqueada ? 'Ativar catraca' : 'Bloquear catraca';
         btnLk.innerHTML = novoBloqueada
           ? '<i class="ph ph-lock" style="color:var(--danger);"></i>'
           : '<i class="ph ph-lock-open"></i>';
       }
       // Desabilita "Liberar passagem" se bloqueada
-      const btnLiberrar = item.querySelector('button[title="Liberar passagem"]');
-      if (btnLiberrar) btnLiberrar.disabled = novoBloqueada;
+      const btnLiberar = item.querySelector('button[title="Liberar passagem"]');
+      if (btnLiberar) btnLiberar.disabled = novoBloqueada;
 
-      if (typeof showToast === 'function') {
-        showToast(
-          novoBloqueada ? `${nome} — catraca bloqueada` : `${nome} — catraca ativada`,
-          novoBloqueada ? 'error' : 'success'
-        );
-      }
+      // Modal de resultado
+      mostrarResultadoBloqueio(novoBloqueada, nome);
+
       console.log(`[MONITOR] ${novoBloqueada ? 'Bloqueio' : 'Ativação'} — ${nome}`);
     };
 
