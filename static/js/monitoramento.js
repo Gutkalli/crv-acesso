@@ -79,9 +79,7 @@ const Monitoramento = (() => {
 
     const onConfirmar = () => {
       fechar();
-      if (typeof showToast === 'function') {
-        showToast(`Comando enviado: ${nome} — passagem liberada`, 'success');
-      }
+      mostrarModalResultado('liberada', nome);
       console.log(`[MONITOR] Liberar passagem — catraca id=${id}, nome="${nome}"`);
     };
 
@@ -233,7 +231,7 @@ const Monitoramento = (() => {
       if (btnLiberar) btnLiberar.disabled = novoBloqueada;
 
       // Modal de resultado
-      mostrarResultadoBloqueio(novoBloqueada, nome);
+      mostrarModalResultado(novoBloqueada ? 'bloqueada' : 'ativada', nome);
 
       console.log(`[MONITOR] ${novoBloqueada ? 'Bloqueio' : 'Ativação'} — ${nome}`);
     };
@@ -450,7 +448,7 @@ const Monitoramento = (() => {
       : '<span class="badge badge-neutral">Saída</span>';
   }
 
-  function mostrarResultadoBloqueio(bloqueada, nome) {
+  function mostrarModalResultado(tipo, nome) {
     const modal   = document.getElementById('modal-resultado-bloqueio');
     const header  = document.getElementById('res-header');
     const iconEl  = document.getElementById('res-icon');
@@ -461,34 +459,57 @@ const Monitoramento = (() => {
     const btnOk   = document.getElementById('btn-resultado-ok');
     if (!modal) return;
 
-    if (bloqueada) {
-      header.style.background  = 'linear-gradient(135deg,#ef4444,#b91c1c)';
-      iconEl.className         = 'ph ph-lock';
-      titulo.textContent       = 'Catraca Bloqueada';
-      desc.textContent         = 'Nenhuma passagem será autorizada enquanto esta catraca estiver bloqueada. O bloqueio pode ser revertido a qualquer momento.';
-      tag.style.background     = 'rgba(239,68,68,0.1)';
-      tag.style.color          = 'var(--danger)';
-      tag.style.border         = '1px solid rgba(239,68,68,0.3)';
-      tag.innerHTML            = '<i class="ph ph-lock"></i> Status: Bloqueada';
-      btnOk.style.background   = 'linear-gradient(135deg,#ef4444,#b91c1c)';
-    } else {
-      header.style.background  = 'linear-gradient(135deg,#10b981,#059669)';
-      iconEl.className         = 'ph ph-lock-open';
-      titulo.textContent       = 'Catraca Ativada';
-      desc.textContent         = 'A catraca voltou a operar normalmente. Todos os acessos configurados foram restaurados com sucesso.';
-      tag.style.background     = 'rgba(16,185,129,0.1)';
-      tag.style.color          = 'var(--success)';
-      tag.style.border         = '1px solid rgba(16,185,129,0.3)';
-      tag.innerHTML            = '<i class="ph ph-check-circle"></i> Status: Ativa';
-      btnOk.style.background   = 'linear-gradient(135deg,#10b981,#059669)';
-    }
+    const cfg = {
+      bloqueada: {
+        gradient: 'linear-gradient(135deg,#ef4444,#b91c1c)',
+        icon:     'ph ph-lock',
+        titulo:   'Catraca Bloqueada',
+        desc:     'Nenhuma passagem será autorizada enquanto esta catraca estiver bloqueada. O bloqueio pode ser revertido a qualquer momento.',
+        tagBg:    'rgba(239,68,68,0.1)',
+        tagColor: 'var(--danger)',
+        tagBorder:'1px solid rgba(239,68,68,0.3)',
+        tagHtml:  '<i class="ph ph-lock"></i> Status: Bloqueada',
+      },
+      ativada: {
+        gradient: 'linear-gradient(135deg,#10b981,#059669)',
+        icon:     'ph ph-lock-open',
+        titulo:   'Catraca Ativada',
+        desc:     'A catraca voltou a operar normalmente. Todos os acessos configurados foram restaurados com sucesso.',
+        tagBg:    'rgba(16,185,129,0.1)',
+        tagColor: 'var(--success)',
+        tagBorder:'1px solid rgba(16,185,129,0.3)',
+        tagHtml:  '<i class="ph ph-check-circle"></i> Status: Ativa',
+      },
+      liberada: {
+        gradient: 'linear-gradient(135deg,#0ea5e9,#0369a1)',
+        icon:     'ph ph-door-open',
+        titulo:   'Passagem Liberada',
+        desc:     'O comando de abertura foi enviado ao equipamento. A ação foi registrada na auditoria do sistema.',
+        tagBg:    'rgba(14,165,233,0.1)',
+        tagColor: 'var(--primary)',
+        tagBorder:'1px solid rgba(14,165,233,0.3)',
+        tagHtml:  '<i class="ph ph-door-open"></i> Comando enviado com sucesso',
+      },
+    };
 
+    const c = cfg[tipo] || cfg.ativada;
+
+    header.style.background = c.gradient;
+    iconEl.className        = c.icon;
+    titulo.textContent      = c.titulo;
+    desc.textContent        = c.desc;
+    tag.style.background    = c.tagBg;
+    tag.style.color         = c.tagColor;
+    tag.style.border        = c.tagBorder;
+    tag.innerHTML           = c.tagHtml;
+    btnOk.style.background  = c.gradient;
     nomeEl.textContent      = nome;
-    modal.style.display     = 'flex';
+
+    modal.style.display          = 'flex';
     document.body.style.overflow = 'hidden';
 
     const fecharResultado = () => {
-      modal.style.display  = 'none';
+      modal.style.display          = 'none';
       document.body.style.overflow = '';
       btnOk.removeEventListener('click', fecharResultado);
     };
