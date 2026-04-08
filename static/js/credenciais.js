@@ -353,14 +353,13 @@ function exportarCredenciais() {
 
   const BOM = '\uFEFF';
   const sep = ';';
-  const colunas = ['Funcionário', 'Tipo', 'Status', 'Identificador', 'Validade', 'Cadastrado em'];
+  const colunas = ['Funcionário', 'Tipo', 'Status', 'Código', 'Cadastrado em'];
 
   const linhas = lista.map(c => [
-    c.funcionario_id || '',
-    c.tipo           || '',
-    c.status         || '',
-    c.identificador  || '',
-    c.validade ? new Date(c.validade).toLocaleDateString('pt-BR') : '',
+    c.funcionarios?.nome || '',
+    c.tipo               || '',
+    c.ativo ? 'Ativo' : 'Bloqueado',
+    c.codigo             || '',
     c.created_at ? new Date(c.created_at).toLocaleDateString('pt-BR') : '',
   ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(sep));
 
