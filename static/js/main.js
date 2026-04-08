@@ -45,6 +45,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ------------------------------------------------------------
    CARREGAR PARTIALS (header + sidebar)
    ------------------------------------------------------------ */
+/* Carrega permissoes.js uma única vez se ainda não estiver disponível */
+function carregarPermissoes() {
+  if (window.permissoesCRV) return Promise.resolve();
+  return new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = 'static/js/core/permissoes.js';
+    s.onload  = resolve;
+    s.onerror = resolve; // não bloqueia se falhar
+    document.head.appendChild(s);
+  });
+}
+
 async function loadPartials() {
   const sidebarContainer = document.getElementById('sidebar-container');
   const headerContainer  = document.getElementById('header-container');
