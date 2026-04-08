@@ -375,6 +375,72 @@
   </div>
 </div>
 
+<!-- Modal: Resultado Bloqueio / Ativação -->
+<div id="modal-resultado-bloqueio" style="
+  display:none;position:fixed;inset:0;z-index:9100;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+">
+  <div style="
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:20px;box-shadow:0 32px 80px rgba(0,0,0,0.3);
+    width:400px;max-width:92vw;overflow:hidden;
+    animation:modalIn .2s ease;
+  ">
+
+    <!-- Header colorido -->
+    <div id="res-header" style="padding:28px 24px 24px;text-align:center;position:relative;">
+      <!-- Ícone grande centralizado -->
+      <div id="res-icon-wrap" style="
+        width:64px;height:64px;border-radius:50%;
+        background:rgba(255,255,255,0.2);
+        display:flex;align-items:center;justify-content:center;
+        margin:0 auto 14px;
+      ">
+        <i id="res-icon" class="ph ph-lock" style="font-size:2rem;color:#fff;"></i>
+      </div>
+      <div id="res-titulo" style="font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:4px;"></div>
+      <div id="res-nome" style="font-size:0.83rem;color:rgba(255,255,255,0.75);"></div>
+    </div>
+
+    <!-- Corpo -->
+    <div style="padding:24px 28px 8px;text-align:center;">
+      <!-- Check de sucesso -->
+      <div style="
+        width:52px;height:52px;border-radius:50%;
+        background:rgba(16,185,129,0.12);border:2px solid rgba(16,185,129,0.35);
+        display:flex;align-items:center;justify-content:center;
+        margin:0 auto 16px;
+      ">
+        <i class="ph ph-check" style="font-size:1.6rem;color:var(--success);"></i>
+      </div>
+      <p style="font-size:0.95rem;font-weight:600;color:var(--text-primary);margin:0 0 8px;">
+        Operação realizada com sucesso.
+      </p>
+      <p id="res-desc" style="font-size:0.82rem;color:var(--text-muted);margin:0 0 6px;line-height:1.5;"></p>
+
+      <!-- Tag de status -->
+      <div id="res-status-tag" style="
+        display:inline-flex;align-items:center;gap:6px;
+        margin-top:12px;padding:6px 14px;border-radius:20px;
+        font-size:0.78rem;font-weight:600;
+      "></div>
+    </div>
+
+    <!-- Rodapé -->
+    <div style="padding:20px 28px 24px;display:flex;justify-content:center;">
+      <button id="btn-resultado-ok" style="
+        min-width:140px;padding:10px 28px;border-radius:10px;
+        border:none;cursor:pointer;font-size:0.9rem;font-weight:600;
+        color:#fff;transition:opacity .15s;
+      " onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <i class="ph ph-check-circle"></i> OK, entendi
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <style>
 @keyframes modalIn {
   from { opacity:0; transform:scale(.95) translateY(8px); }
