@@ -759,26 +759,33 @@ async function salvarSecao(secaoId) {
     }
   }
 
+  // Sempre mostra modal de confirmação antes de salvar
+  _secaoPendente = secaoId;
+
   const supabase = getSupabaseInstance();
-  if (!supabase) { await executarSalvarSecao(secaoId); return; }
-
-  const { data } = await supabase.from('configuracoes').select('chave').eq('chave', cfg.chave).limit(1);
-  const jaExiste  = data && data.length > 0;
-
-  if (!jaExiste) {
-    await executarSalvarSecao(secaoId);
-    return;
+  let jaExiste = false;
+  if (supabase) {
+    const { data } = await supabase.from('configuracoes').select('chave').eq('chave', cfg.chave).limit(1);
+    jaExiste = data && data.length > 0;
   }
 
-  // Já existe → modal de confirmação
-  _secaoPendente = secaoId;
+  // Atualiza descrição do modal conforme contexto
   const descEl = document.getElementById('modal-confirmar-desc');
-  if (descEl) descEl.innerHTML = `Já existe configuração salva em <strong>${cfg.label}</strong>.<br>O que deseja fazer?`;
+  if (descEl) {
+    if (jaExiste) {
+      descEl.innerHTML = `Já existe configuração salva em <strong>${cfg.label}</strong>.<br>Deseja atualizar os dados?`;
+    } else {
+      descEl.innerHTML = `Você está salvando <strong>${cfg.label}</strong> pela primeira vez.<br>Deseja confirmar?`;
+    }
+  }
+
+  // Botão excluir só para ADM e só quando já existe
   const btnEx = document.getElementById('btn-confirmar-excluir');
   if (btnEx) {
     const u = window.sessionCRV?.obterUsuarioLogado?.() || {};
-    btnEx.style.display = u.perfil === 'admin' ? '' : 'none';
+    btnEx.style.display = (jaExiste && u.perfil === 'admin') ? '' : 'none';
   }
+
   document.getElementById('modal-confirmar-salvar').classList.remove('cfg-hidden');
 }
 
