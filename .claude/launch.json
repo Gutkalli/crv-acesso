@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "crv-acesso",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "C:\\Python314\\python.exe",
       "runtimeArgs": ["-m", "http.server", "5500"],
       "port": 5500
     }
