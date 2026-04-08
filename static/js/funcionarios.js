@@ -436,7 +436,7 @@ async function liberarAcesso(id) {
       tipo: 'entrada',
       metodo: 'manual',
       resultado: 'liberado',
-      data: new Date()
+      data: new Date().toISOString()
     }]);
 
     if (error) {
