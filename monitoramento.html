@@ -33,8 +33,9 @@
     <button class="btn btn-ghost btn-sm" id="btn-pausar">
       <i class="ph ph-pause"></i> Pausar
     </button>
-    <button class="btn btn-primary btn-sm">
+    <button class="btn btn-primary btn-sm" id="btn-filtros">
       <i class="ph ph-funnel"></i> Filtros
+      <span id="badge-filtros-ativos" style="display:none;margin-left:4px;background:#fff;color:var(--primary);border-radius:10px;font-size:0.7rem;font-weight:700;padding:1px 6px;">0</span>
     </button>
   </div>
 </div>
@@ -206,6 +207,124 @@
 
   </main>
 </div>
+
+<!-- Modal: Status de Conexão -->
+<div id="modal-conexao" style="
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+">
+  <div style="
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    width:380px;max-width:92vw;overflow:hidden;animation:modalIn .18s ease;
+  ">
+    <div style="background:linear-gradient(135deg,#6366f1,#4338ca);padding:22px 24px 18px;display:flex;align-items:center;gap:14px;">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="ph ph-wifi-high" style="font-size:1.3rem;color:#fff;"></i>
+      </div>
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;">Status da Conexão</div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);">Monitoramento em tempo real</div>
+      </div>
+      <button id="btn-conexao-fechar" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;background:var(--bg);">
+        <span style="font-size:0.83rem;color:var(--text-muted);">Status</span>
+        <span id="conexao-status-badge" style="display:flex;align-items:center;gap:6px;font-size:0.83rem;font-weight:600;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;background:var(--bg);">
+        <span style="font-size:0.83rem;color:var(--text-muted);">Modo</span>
+        <span style="font-size:0.83rem;font-weight:600;color:var(--text-primary);">Tempo real (Supabase)</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:10px;background:var(--bg);">
+        <span style="font-size:0.83rem;color:var(--text-muted);">Última sincronização</span>
+        <span id="conexao-ultima-sync" style="font-size:0.83rem;font-weight:600;color:var(--text-primary);">—</span>
+      </div>
+    </div>
+    <div style="padding:4px 24px 20px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);">
+      <button id="btn-reconectar" class="btn btn-ghost" style="gap:6px;">
+        <i class="ph ph-arrows-clockwise"></i> Reconectar
+      </button>
+      <button id="btn-conexao-ok" class="btn btn-primary">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Filtros Avançados -->
+<div id="modal-filtros" style="
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+">
+  <div style="
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,0.25);
+    width:420px;max-width:92vw;overflow:hidden;animation:modalIn .18s ease;
+  ">
+    <div style="background:linear-gradient(135deg,var(--primary),#0369a1);padding:22px 24px 18px;display:flex;align-items:center;gap:14px;">
+      <div style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="ph ph-funnel" style="font-size:1.3rem;color:#fff;"></i>
+      </div>
+      <div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;">Filtrar Feed</div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.75);">Refine os eventos exibidos</div>
+      </div>
+      <button id="btn-filtros-fechar" style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;color:#fff;font-size:1rem;display:flex;align-items:center;justify-content:center;">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+
+      <div>
+        <label style="font-size:0.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Resultado</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="filtro-resultado-btns">
+          <button class="filtro-chip active" data-val="">Todos</button>
+          <button class="filtro-chip" data-val="liberado"><i class="ph ph-check-circle"></i> Liberado</button>
+          <button class="filtro-chip" data-val="negado"><i class="ph ph-x-circle"></i> Negado</button>
+          <button class="filtro-chip" data-val="alerta"><i class="ph ph-warning"></i> Alerta</button>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:0.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;">Tipo de Evento</label>
+        <div style="display:flex;gap:8px;" id="filtro-tipo-btns">
+          <button class="filtro-chip active" data-val="">Todos</button>
+          <button class="filtro-chip" data-val="entrada"><i class="ph ph-sign-in"></i> Entrada</button>
+          <button class="filtro-chip" data-val="saida"><i class="ph ph-sign-out"></i> Saída</button>
+        </div>
+      </div>
+
+    </div>
+    <div style="padding:4px 24px 20px;display:flex;gap:10px;justify-content:space-between;border-top:1px solid var(--border);">
+      <button id="btn-filtros-limpar" class="btn btn-ghost"><i class="ph ph-eraser"></i> Limpar filtros</button>
+      <button id="btn-filtros-aplicar" class="btn btn-primary"><i class="ph ph-funnel"></i> Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.filtro-chip {
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:500;
+  border:1px solid var(--border);background:var(--bg);color:var(--text-muted);
+  cursor:pointer;transition:all .15s;
+}
+.filtro-chip.active {
+  background:var(--primary);color:#fff;border-color:var(--primary);
+}
+.filtro-chip:hover:not(.active) {
+  border-color:var(--primary);color:var(--primary);
+}
+#btn-pausar.pausado {
+  background: rgba(245,158,11,0.12);
+  color: var(--warning);
+  border-color: rgba(245,158,11,0.4);
+}
+</style>
 
 <!-- Modal: Ver Logs da Catraca -->
 <div id="modal-logs" style="

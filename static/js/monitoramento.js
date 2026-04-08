@@ -13,6 +13,8 @@ const Monitoramento = (() => {
 
   let pausado = false;
   let online = navigator.onLine;
+  let ultimaSync = null;
+  let filtrosAtivos = { resultado: '', tipo: '' };
 
   const feedEl = () => document.getElementById('monitor-feed');
 
@@ -21,6 +23,8 @@ const Monitoramento = (() => {
       console.log('📡 Inicializando monitoramento...');
 
       bindEventos();
+      initFiltrosModal();
+      initConexaoModal();
       atualizarStatusRede();
 
       await carregarInicial();
@@ -289,8 +293,8 @@ const Monitoramento = (() => {
   function adicionarEvento(ev) {
     if (pausado) return;
 
-    const filtro = document.getElementById('filtro-tipo').value;
-    if (filtro && ev.resultado !== filtro) return;
+    if (filtrosAtivos.resultado && ev.resultado !== filtrosAtivos.resultado) return;
+    if (filtrosAtivos.tipo && ev.tipo !== filtrosAtivos.tipo) return;
 
     const hora = new Date(ev.data).toLocaleTimeString('pt-BR');
 
