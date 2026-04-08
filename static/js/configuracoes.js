@@ -800,14 +800,30 @@ function initAcoesCabecalho() {
     salvarSecao(secaoAtiva);
   });
 
-  // Restaurar — recarrega do banco apenas a seção ativa
+  // Restaurar — abre modal customizado
   document.getElementById('btn-cfg-restaurar')?.addEventListener('click', () => {
     const secaoAtiva = document.querySelector('.cfg-nav-item.active')?.dataset.secao || 'geral';
     const label = CFG_SECAO_MAP[secaoAtiva]?.label || secaoAtiva;
-    const ok = confirm(`Deseja restaurar a seção "${label}" com os valores salvos?`);
-    if (!ok) return;
+    const descEl = document.getElementById('modal-restaurar-desc');
+    if (descEl) descEl.innerHTML = `Deseja restaurar <strong>${label}</strong> com os valores salvos no banco?<br>Os campos voltarão ao último valor salvo.`;
+    // Guarda a seção no botão de confirmar
+    const btnConf = document.getElementById('btn-restaurar-confirmar');
+    if (btnConf) btnConf.dataset.secao = secaoAtiva;
+    document.getElementById('modal-confirmar-restaurar').classList.remove('cfg-hidden');
+  });
+
+  // Modal Restaurar — Confirmar
+  document.getElementById('btn-restaurar-confirmar')?.addEventListener('click', () => {
+    document.getElementById('modal-confirmar-restaurar').classList.add('cfg-hidden');
+    const secaoAtiva = document.getElementById('btn-restaurar-confirmar').dataset.secao || 'geral';
+    const label = CFG_SECAO_MAP[secaoAtiva]?.label || secaoAtiva;
     carregarConfiguracoes();
-    mostrarToast(`${label} restaurado.`, 'info');
+    mostrarToast(`${label} restaurado com sucesso.`, 'info');
+  });
+
+  // Modal Restaurar — Cancelar
+  document.getElementById('btn-restaurar-cancelar')?.addEventListener('click', () => {
+    document.getElementById('modal-confirmar-restaurar').classList.add('cfg-hidden');
   });
 
   // Modal — Atualizar
