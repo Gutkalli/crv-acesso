@@ -770,7 +770,33 @@
   </div>
 </div>
 
-<!-- Modal de confirmação de atualização de configurações -->
+<!-- Modal de confirmação: RESTAURAR -->
+<div class="modal-overlay cfg-hidden" id="modal-confirmar-restaurar">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <h3 style="display:flex;align-items:center;gap:8px;font-size:1.05rem;font-weight:700;">
+        <i class="ph ph-arrow-counter-clockwise" style="color:var(--warning);font-size:1.3rem;"></i>
+        Restaurar seção
+      </h3>
+    </div>
+    <p id="modal-restaurar-desc" style="margin-top:14px;font-size:0.88rem;color:var(--text-muted);line-height:1.7;">
+      Deseja restaurar esta seção com os valores salvos no banco?
+    </p>
+    <p style="margin-top:8px;font-size:0.82rem;color:var(--warning);display:flex;align-items:center;gap:6px;">
+      <i class="ph ph-warning"></i> Os campos voltarão ao último valor salvo.
+    </p>
+    <div class="modal-footer" style="margin-top:22px;display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost" id="btn-restaurar-cancelar">
+        <i class="ph ph-x"></i> Cancelar
+      </button>
+      <button class="btn btn-primary" id="btn-restaurar-confirmar">
+        <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmação: SALVAR -->
 <div class="modal-overlay cfg-hidden" id="modal-confirmar-salvar">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
