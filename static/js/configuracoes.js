@@ -1138,8 +1138,8 @@ function renderLinhaOperador(op) {
   const tbody = document.getElementById('cfg-usuarios-tbody');
   if (!tbody) return;
 
-  const perfilLabel = { admin: 'Administrador', operador: 'Operador', visualizador: 'Visualizador' };
-  const perfilBadge = { admin: 'badge-danger',  operador: 'badge-warning', visualizador: 'badge-neutral' };
+  const perfilLabel = { admin: 'Administrador', gerente: 'Gerente', operador: 'Operador' };
+  const perfilBadge = { admin: 'badge-danger',  gerente: 'badge-info',    operador: 'badge-warning' };
 
   const tr = document.createElement('tr');
   tr.innerHTML = `
