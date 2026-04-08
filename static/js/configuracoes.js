@@ -749,11 +749,13 @@ async function salvarSecao(secaoId) {
   const cfg = CFG_SECAO_MAP[secaoId];
   if (!cfg) return;
 
-  // Validação de campos obrigatórios
+  // Validação de campos obrigatórios — abre modal de erro
   for (const { id, msg } of (cfg.required || [])) {
     const el = document.getElementById(id);
     if (!el || !el.value.trim()) {
-      mostrarToast(msg, 'error');
+      const descEl = document.getElementById('modal-erro-desc');
+      if (descEl) descEl.textContent = msg;
+      document.getElementById('modal-erro-validacao').classList.remove('cfg-hidden');
       el?.focus();
       return;
     }
@@ -854,10 +856,15 @@ function initAcoesCabecalho() {
     mostrarToast(`Dados de ${cfg.label} excluídos.`, 'success');
   });
 
-  // Modal — Cancelar
+  // Modal — Cancelar (salvar)
   document.getElementById('btn-confirmar-cancelar')?.addEventListener('click', () => {
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
     _secaoPendente = null;
+  });
+
+  // Modal erro validação — fechar
+  document.getElementById('btn-erro-fechar')?.addEventListener('click', () => {
+    document.getElementById('modal-erro-validacao').classList.add('cfg-hidden');
   });
 }
 

@@ -53,6 +53,77 @@
   gap: 12px;
 }
 
+/* =====================================================
+   MODAIS CUSTOMIZADOS — Salvar / Restaurar / Erro
+   ===================================================== */
+
+.cfg-modal-confirmar,
+.cfg-modal-validacao {
+  text-align: center;
+  padding: 36px 32px 28px;
+}
+
+.cfg-modal-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  font-size: 2rem;
+}
+
+.cfg-modal-icon-salvar   { background: rgba(var(--primary-rgb, 14,165,233), 0.12); color: var(--primary); }
+.cfg-modal-icon-restaurar{ background: rgba(var(--warning-rgb, 245,158,11),  0.12); color: var(--warning); }
+.cfg-modal-icon-erro     { background: rgba(var(--danger-rgb,  239,68,68),   0.12); color: var(--danger);  }
+
+.cfg-modal-titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+}
+
+.cfg-modal-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.cfg-modal-aviso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--warning);
+  background: rgba(245,158,11,.08);
+  border: 1px solid rgba(245,158,11,.25);
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-bottom: 22px;
+}
+
+.cfg-modal-footer-acoes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cfg-modal-footer-center {
+  display: flex;
+  justify-content: center;
+}
+
+.cfg-btn-excluir {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
 .modal .modal-close {
   background: none;
   border: none;
