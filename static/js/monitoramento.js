@@ -259,6 +259,7 @@ const Monitoramento = (() => {
         renderFeed(dados);
         atualizarKPIs(dados);
 
+        ultimaSync = Date.now();
         console.log('✅ Dados carregados (online)');
       } else {
         // Modo offline: busca do IndexedDB local
@@ -386,14 +387,134 @@ const Monitoramento = (() => {
 
   function togglePausa() {
     pausado = !pausado;
-
-    document.getElementById('btn-pausar').innerHTML = pausado
+    const btn = document.getElementById('btn-pausar');
+    btn.innerHTML = pausado
       ? '<i class="ph ph-play"></i> Retomar'
       : '<i class="ph ph-pause"></i> Pausar';
+    btn.classList.toggle('pausado', pausado);
   }
 
   function aplicarFiltro() {
     carregarInicial();
+  }
+
+  function initFiltrosModal() {
+    const modal    = document.getElementById('modal-filtros');
+    const btnAbrir = document.getElementById('btn-filtros');
+    const btnFechar= document.getElementById('btn-filtros-fechar');
+    const btnLimpar= document.getElementById('btn-filtros-limpar');
+    const btnAplicar=document.getElementById('btn-filtros-aplicar');
+    if (!modal) return;
+
+    // Chips de seleção única
+    function initChipGroup(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.querySelectorAll('.filtro-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          container.querySelectorAll('.filtro-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+    }
+
+    initChipGroup('filtro-resultado-btns');
+    initChipGroup('filtro-tipo-btns');
+
+    const fechar = () => { modal.style.display = 'none'; };
+
+    btnAbrir?.addEventListener('click', () => {
+      // Sincroniza estado atual nos chips
+      _ativarChip('filtro-resultado-btns', filtrosAtivos.resultado);
+      _ativarChip('filtro-tipo-btns',      filtrosAtivos.tipo);
+      modal.style.display = 'flex';
+    });
+
+    btnFechar?.addEventListener('click', fechar);
+
+    btnLimpar?.addEventListener('click', () => {
+      filtrosAtivos = { resultado: '', tipo: '' };
+      _ativarChip('filtro-resultado-btns', '');
+      _ativarChip('filtro-tipo-btns', '');
+      atualizarBadgeFiltros();
+      carregarInicial();
+      fechar();
+    });
+
+    btnAplicar?.addEventListener('click', () => {
+      filtrosAtivos.resultado = _chipAtivo('filtro-resultado-btns');
+      filtrosAtivos.tipo      = _chipAtivo('filtro-tipo-btns');
+      atualizarBadgeFiltros();
+      carregarInicial();
+      fechar();
+    });
+  }
+
+  function _chipAtivo(containerId) {
+    return document.querySelector(`#${containerId} .filtro-chip.active`)?.dataset.val || '';
+  }
+
+  function _ativarChip(containerId, val) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.querySelectorAll('.filtro-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.val === val);
+    });
+  }
+
+  function atualizarBadgeFiltros() {
+    const badge = document.getElementById('badge-filtros-ativos');
+    const btn   = document.getElementById('btn-filtros');
+    const ativos = [filtrosAtivos.resultado, filtrosAtivos.tipo].filter(Boolean).length;
+    if (badge) {
+      badge.style.display = ativos ? 'inline' : 'none';
+      badge.textContent   = ativos;
+    }
+    if (btn) btn.style.outline = ativos ? '2px solid rgba(255,255,255,0.5)' : '';
+  }
+
+  function initConexaoModal() {
+    const badge  = document.getElementById('ws-status');
+    const modal  = document.getElementById('modal-conexao');
+    const btnOk  = document.getElementById('btn-conexao-ok');
+    const btnFch = document.getElementById('btn-conexao-fechar');
+    const btnRec = document.getElementById('btn-reconectar');
+    if (!modal) return;
+
+    const fechar = () => { modal.style.display = 'none'; };
+
+    badge?.addEventListener('click', () => {
+      const statusBadge = document.getElementById('conexao-status-badge');
+      const syncEl      = document.getElementById('conexao-ultima-sync');
+      if (statusBadge) {
+        statusBadge.innerHTML = online
+          ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span> Conectado'
+          : '<span style="width:8px;height:8px;border-radius:50%;background:var(--danger);display:inline-block;"></span> Offline';
+        statusBadge.style.color = online ? 'var(--success)' : 'var(--danger)';
+      }
+      if (syncEl) {
+        syncEl.textContent = ultimaSync
+          ? new Date(ultimaSync).toLocaleTimeString('pt-BR')
+          : 'Nunca';
+      }
+      modal.style.display = 'flex';
+    });
+
+    btnOk?.addEventListener('click', fechar);
+    btnFch?.addEventListener('click', fechar);
+
+    btnRec?.addEventListener('click', () => {
+      btnRec.innerHTML = '<i class="ph ph-spinner"></i> Reconectando...';
+      btnRec.disabled  = true;
+      setTimeout(async () => {
+        await carregarInicial();
+        iniciarRealtime();
+        ultimaSync = Date.now();
+        btnRec.innerHTML = '<i class="ph ph-arrows-clockwise"></i> Reconectar';
+        btnRec.disabled  = false;
+        fechar();
+      }, 1500);
+    });
   }
 
   function onOnline() {
