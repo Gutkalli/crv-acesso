@@ -450,6 +450,52 @@ const Monitoramento = (() => {
       : '<span class="badge badge-neutral">Saída</span>';
   }
 
+  function mostrarResultadoBloqueio(bloqueada, nome) {
+    const modal   = document.getElementById('modal-resultado-bloqueio');
+    const header  = document.getElementById('res-header');
+    const iconEl  = document.getElementById('res-icon');
+    const titulo  = document.getElementById('res-titulo');
+    const nomeEl  = document.getElementById('res-nome');
+    const desc    = document.getElementById('res-desc');
+    const tag     = document.getElementById('res-status-tag');
+    const btnOk   = document.getElementById('btn-resultado-ok');
+    if (!modal) return;
+
+    if (bloqueada) {
+      header.style.background  = 'linear-gradient(135deg,#ef4444,#b91c1c)';
+      iconEl.className         = 'ph ph-lock';
+      titulo.textContent       = 'Catraca Bloqueada';
+      desc.textContent         = 'Nenhuma passagem será autorizada enquanto esta catraca estiver bloqueada. O bloqueio pode ser revertido a qualquer momento.';
+      tag.style.background     = 'rgba(239,68,68,0.1)';
+      tag.style.color          = 'var(--danger)';
+      tag.style.border         = '1px solid rgba(239,68,68,0.3)';
+      tag.innerHTML            = '<i class="ph ph-lock"></i> Status: Bloqueada';
+      btnOk.style.background   = 'linear-gradient(135deg,#ef4444,#b91c1c)';
+    } else {
+      header.style.background  = 'linear-gradient(135deg,#10b981,#059669)';
+      iconEl.className         = 'ph ph-lock-open';
+      titulo.textContent       = 'Catraca Ativada';
+      desc.textContent         = 'A catraca voltou a operar normalmente. Todos os acessos configurados foram restaurados com sucesso.';
+      tag.style.background     = 'rgba(16,185,129,0.1)';
+      tag.style.color          = 'var(--success)';
+      tag.style.border         = '1px solid rgba(16,185,129,0.3)';
+      tag.innerHTML            = '<i class="ph ph-check-circle"></i> Status: Ativa';
+      btnOk.style.background   = 'linear-gradient(135deg,#10b981,#059669)';
+    }
+
+    nomeEl.textContent      = nome;
+    modal.style.display     = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    const fecharResultado = () => {
+      modal.style.display  = 'none';
+      document.body.style.overflow = '';
+      btnOk.removeEventListener('click', fecharResultado);
+    };
+
+    btnOk.addEventListener('click', fecharResultado);
+  }
+
   return { init };
 
 })();
