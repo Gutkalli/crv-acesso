@@ -685,101 +685,156 @@ const CFG_SECAO_MAP = {
   },
 };
 
+/* ─────────────────────────────────────────────────────────
+   COLETOR: retorna os dados de um grupo para salvar
+   ───────────────────────────────────────────────────────── */
+async function coletarDadosGrupo(grupo) {
+  const temaAtual = document.documentElement.getAttribute('data-theme') || 'dark';
+  const temaSel   = document.querySelector('.cfg-tema-item.active')?.dataset.tema || temaAtual;
+
+  const coletores = {
+    empresa:       () => ({ nome: getVal('cfg-empresa-nome'), cnpj: getVal('cfg-empresa-cnpj'), endereco: getVal('cfg-empresa-endereco'), tel: getVal('cfg-empresa-tel') }),
+    regional:      () => ({ fuso: getVal('cfg-fuso'), dataFmt: getVal('cfg-data-fmt'), idioma: getVal('cfg-idioma') }),
+    comportamento: () => ({ logoutAuto: getCheck('cfg-logout-auto'), inatividade: getVal('cfg-inatividade'), somAlerta: getCheck('cfg-som-alerta') }),
+    aparencia:     async () => { const ap = (await lerChave('aparencia')) || {}; return { ...ap, tema: temaSel, sidebarCollapsed: getCheck('cfg-sidebar-collapsed'), animReduzida: getCheck('cfg-anim-reduzida'), densidade: getCheck('cfg-densidade') }; },
+    seguranca:     () => ({ senhaForte: getCheck('cfg-senha-forte'), senhaExpira: getCheck('cfg-senha-expira'), prazoSenha: getVal('cfg-prazo-senha'), twofa: getCheck('cfg-2fa'), tentativas: getVal('cfg-tentativas') }),
+    notificacoes:  () => ({ email: getVal('cfg-email-notif'), cc: getVal('cfg-email-cc'), negado: getCheck('cfg-notif-negado'), critico: getCheck('cfg-notif-critico'), offline: getCheck('cfg-notif-offline'), relatorio: getCheck('cfg-notif-relatorio') }),
+    integracao:    () => ({ apiUrl: getVal('cfg-api-url'), apiPorta: getVal('cfg-api-porta'), apiUsuario: getVal('cfg-api-usuario'), syncAuto: getCheck('cfg-sync-auto'), syncIntervalo: getVal('cfg-sync-intervalo') }),
+    backup:        () => ({ auto: getCheck('cfg-backup-auto'), freq: getVal('cfg-backup-freq'), retencao: getVal('cfg-backup-retencao') }),
+  };
+  const fn = coletores[grupo];
+  return fn ? await fn() : null;
+}
+
+/* ─────────────────────────────────────────────────────────
+   EXECUTAR: salva os grupos da seção sem confirmação
+   ───────────────────────────────────────────────────────── */
+let _secaoPendente = null;
+
+async function executarSalvarSecao(secaoId) {
+  const cfg = CFG_SECAO_MAP[secaoId];
+  if (!cfg) return;
+
+  const btn = document.getElementById('btn-cfg-salvar');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph ph-circle-notch"></i> Salvando...'; }
+
+  let sucesso = true;
+  for (const grupo of cfg.grupos) {
+    const dados = await coletarDadosGrupo(grupo);
+    if (dados !== null) {
+      const ok = await salvarChave(grupo, dados);
+      if (!ok) { sucesso = false; break; }
+    }
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ph ph-floppy-disk"></i> Salvar alterações'; }
+
+  if (sucesso) {
+    if (secaoId === 'aparencia') {
+      const t = document.querySelector('.cfg-tema-item.active')?.dataset.tema
+             || document.documentElement.getAttribute('data-theme') || 'dark';
+      aplicarTema(t);
+    }
+    await registrarAuditoria({ acao: 'editar', modulo: 'configuracoes', tabela: 'configuracoes', descricao: `Seção "${cfg.label}" atualizada`, nivel: 'info' });
+    mostrarToast(`${cfg.label} salvo com sucesso!`, 'success');
+  } else {
+    mostrarToast(`Erro ao salvar ${cfg.label}. Tente novamente.`, 'error');
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   SALVAR SEÇÃO: valida → checa existência → decide
+   ───────────────────────────────────────────────────────── */
+async function salvarSecao(secaoId) {
+  const cfg = CFG_SECAO_MAP[secaoId];
+  if (!cfg) return;
+
+  // Validação de campos obrigatórios
+  for (const { id, msg } of (cfg.required || [])) {
+    const el = document.getElementById(id);
+    if (!el || !el.value.trim()) {
+      mostrarToast(msg, 'error');
+      el?.focus();
+      return;
+    }
+  }
+
+  const supabase = getSupabaseInstance();
+  if (!supabase) { await executarSalvarSecao(secaoId); return; }
+
+  const { data } = await supabase.from('configuracoes').select('chave').eq('chave', cfg.chave).limit(1);
+  const jaExiste  = data && data.length > 0;
+
+  if (!jaExiste) {
+    await executarSalvarSecao(secaoId);
+    return;
+  }
+
+  // Já existe → modal de confirmação
+  _secaoPendente = secaoId;
+  const descEl = document.getElementById('modal-confirmar-desc');
+  if (descEl) descEl.innerHTML = `Já existe configuração salva em <strong>${cfg.label}</strong>.<br>O que deseja fazer?`;
+  const btnEx = document.getElementById('btn-confirmar-excluir');
+  if (btnEx) {
+    const u = window.sessionCRV?.obterUsuarioLogado?.() || {};
+    btnEx.style.display = u.perfil === 'admin' ? '' : 'none';
+  }
+  document.getElementById('modal-confirmar-salvar').classList.remove('cfg-hidden');
+}
+
+/* ─────────────────────────────────────────────────────────
+   INIT: botões do topo + modal de confirmação
+   ───────────────────────────────────────────────────────── */
 function initAcoesCabecalho() {
 
-  // ── Botão Salvar ──────────────────────────────────────────────
-  document.getElementById('btn-cfg-salvar')?.addEventListener('click', async () => {
-    const supabase = getSupabaseInstance();
-    if (!supabase) { salvarConfiguracoes(); return; }
-
-    // Descobre qual seção está ativa no menu lateral
+  // Salvar — age sobre a seção ativa no menu
+  document.getElementById('btn-cfg-salvar')?.addEventListener('click', () => {
     const secaoAtiva = document.querySelector('.cfg-nav-item.active')?.dataset.secao || 'geral';
-    const secaoCfg   = CFG_SECAO_MAP[secaoAtiva];
-
-    // Seções sem chave no banco (Usuários, Avançado) salvam direto
-    if (!secaoCfg) { salvarConfiguracoes(); return; }
-
-    // Verifica se já existe dado salvo PARA ESTA SEÇÃO
-    const { data } = await supabase
-      .from('configuracoes')
-      .select('chave')
-      .eq('chave', secaoCfg.chave)
-      .limit(1);
-
-    const jaExiste = data && data.length > 0;
-
-    if (jaExiste) {
-      // Atualiza modal com contexto da seção atual
-      const descEl = document.getElementById('modal-confirmar-desc');
-      if (descEl) descEl.innerHTML =
-        `Já existe configuração salva em <strong>${secaoCfg.label}</strong>.<br>O que deseja fazer?`;
-
-      const btnExcluir = document.getElementById('btn-confirmar-excluir');
-      if (btnExcluir) {
-        // Só admin vê o botão de excluir
-        const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
-        btnExcluir.style.display = usuario.perfil === 'admin' ? '' : 'none';
-        btnExcluir.dataset.secao = secaoAtiva; // guarda contexto para o clique
-      }
-
-      document.getElementById('modal-confirmar-salvar').classList.remove('cfg-hidden');
-    } else {
-      // Primeiro salvamento desta seção — vai direto
-      salvarConfiguracoes();
-    }
+    salvarSecao(secaoAtiva);
   });
 
-  // ── Modal: Atualizar ──────────────────────────────────────────
-  document.getElementById('btn-confirmar-atualizar')?.addEventListener('click', () => {
+  // Restaurar — recarrega do banco apenas a seção ativa
+  document.getElementById('btn-cfg-restaurar')?.addEventListener('click', () => {
+    const secaoAtiva = document.querySelector('.cfg-nav-item.active')?.dataset.secao || 'geral';
+    const label = CFG_SECAO_MAP[secaoAtiva]?.label || secaoAtiva;
+    const ok = confirm(`Deseja restaurar a seção "${label}" com os valores salvos?`);
+    if (!ok) return;
+    carregarConfiguracoes();
+    mostrarToast(`${label} restaurado.`, 'info');
+  });
+
+  // Modal — Atualizar
+  document.getElementById('btn-confirmar-atualizar')?.addEventListener('click', async () => {
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
-    salvarConfiguracoes();
+    if (_secaoPendente) await executarSalvarSecao(_secaoPendente);
+    _secaoPendente = null;
   });
 
-  // ── Modal: Excluir dados da seção (somente ADM) ───────────────
+  // Modal — Excluir (somente ADM, somente a chave da seção)
   document.getElementById('btn-confirmar-excluir')?.addEventListener('click', async () => {
-    const usuario = window.sessionCRV?.obterUsuarioLogado?.() || {};
-    if (usuario.perfil !== 'admin') {
+    const u = window.sessionCRV?.obterUsuarioLogado?.() || {};
+    if (u.perfil !== 'admin') {
       mostrarToast('Apenas administradores podem excluir configurações.', 'error');
       document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
       return;
     }
-
-    const secaoAtiva = document.getElementById('btn-confirmar-excluir').dataset.secao || 'geral';
-    const secaoCfg   = CFG_SECAO_MAP[secaoAtiva];
-    if (!secaoCfg) return;
-
+    const secaoId = _secaoPendente || 'geral';
+    const cfg     = CFG_SECAO_MAP[secaoId];
+    _secaoPendente = null;
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
-
+    if (!cfg) return;
     const supabase = getSupabaseInstance();
     if (!supabase) return;
-
-    // Apaga SOMENTE a chave da seção atual — todo o resto fica intacto
-    const { error } = await supabase
-      .from('configuracoes')
-      .delete()
-      .eq('chave', secaoCfg.chave);
-
-    if (error) {
-      mostrarToast(`Erro ao excluir dados de ${secaoCfg.label}.`, 'error');
-      return;
-    }
-
-    // Limpa os campos do formulário correspondentes
-    secaoCfg.limpar.forEach(id => setVal(id, ''));
-
-    mostrarToast(`Dados de ${secaoCfg.label} excluídos com sucesso.`, 'success');
+    const { error } = await supabase.from('configuracoes').delete().eq('chave', cfg.chave);
+    if (error) { mostrarToast(`Erro ao excluir ${cfg.label}.`, 'error'); return; }
+    cfg.limpar.forEach(id => setVal(id, ''));
+    mostrarToast(`Dados de ${cfg.label} excluídos.`, 'success');
   });
 
-  // ── Modal: Cancelar ───────────────────────────────────────────
+  // Modal — Cancelar
   document.getElementById('btn-confirmar-cancelar')?.addEventListener('click', () => {
     document.getElementById('modal-confirmar-salvar').classList.add('cfg-hidden');
-  });
-
-  // ── Restaurar padrões ─────────────────────────────────────────
-  document.getElementById('btn-cfg-restaurar')?.addEventListener('click', () => {
-    const ok = confirm('Deseja restaurar todas as configurações para os valores padrão?');
-    if (!ok) return;
-    location.reload();
+    _secaoPendente = null;
   });
 }
 
@@ -878,94 +933,6 @@ async function carregarConfiguracoes() {
    SALVAR CONFIGURAÇÕES NO SUPABASE
    ===================================================== */
 
-async function salvarConfiguracoes() {
-  const btn = document.getElementById('btn-cfg-salvar');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ph ph-circle-notch"></i> Salvando...';
-
-  // Lê tema selecionado; se nenhum botão estiver ativo usa o tema atual do documento
-  const temaAtual = document.documentElement.getAttribute('data-theme') || 'dark';
-  const temaSel = document.querySelector('.cfg-tema-item.active')?.dataset.tema || temaAtual;
-
-  // Coleta o logoUrl atual (não sobrescreve com vazio)
-  const apAtual = (await lerChave('aparencia')) || {};
-
-  const grupos = {
-    empresa: {
-      nome:     getVal('cfg-empresa-nome'),
-      cnpj:     getVal('cfg-empresa-cnpj'),
-      endereco: getVal('cfg-empresa-endereco'),
-      tel:      getVal('cfg-empresa-tel'),
-    },
-    regional: {
-      fuso:    getVal('cfg-fuso'),
-      dataFmt: getVal('cfg-data-fmt'),
-      idioma:  getVal('cfg-idioma'),
-    },
-    comportamento: {
-      logoutAuto:  getCheck('cfg-logout-auto'),
-      inatividade: getVal('cfg-inatividade'),
-      somAlerta:   getCheck('cfg-som-alerta'),
-    },
-    aparencia: {
-      ...apAtual,          // preserva logoUrl e outros campos já salvos
-      tema:            temaSel,
-      sidebarCollapsed:getCheck('cfg-sidebar-collapsed'),
-      animReduzida:    getCheck('cfg-anim-reduzida'),
-      densidade:       getCheck('cfg-densidade'),
-    },
-    seguranca: {
-      senhaForte:  getCheck('cfg-senha-forte'),
-      senhaExpira: getCheck('cfg-senha-expira'),
-      prazoSenha:  getVal('cfg-prazo-senha'),
-      twofa:       getCheck('cfg-2fa'),
-      tentativas:  getVal('cfg-tentativas'),
-    },
-    notificacoes: {
-      email:    getVal('cfg-email-notif'),
-      cc:       getVal('cfg-email-cc'),
-      negado:   getCheck('cfg-notif-negado'),
-      critico:  getCheck('cfg-notif-critico'),
-      offline:  getCheck('cfg-notif-offline'),
-      relatorio:getCheck('cfg-notif-relatorio'),
-    },
-    integracao: {
-      apiUrl:        getVal('cfg-api-url'),
-      apiPorta:      getVal('cfg-api-porta'),
-      apiUsuario:    getVal('cfg-api-usuario'),
-      syncAuto:      getCheck('cfg-sync-auto'),
-      syncIntervalo: getVal('cfg-sync-intervalo'),
-    },
-    backup: {
-      auto:      getCheck('cfg-backup-auto'),
-      freq:      getVal('cfg-backup-freq'),
-      retencao:  getVal('cfg-backup-retencao'),
-    },
-  };
-
-  let sucesso = true;
-  for (const [chave, valor] of Object.entries(grupos)) {
-    const ok = await salvarChave(chave, valor);
-    if (!ok) { sucesso = false; break; }
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ph ph-floppy-disk"></i> Salvar alterações';
-
-  if (sucesso) {
-    aplicarTema(temaSel);
-    await registrarAuditoria({
-      acao:      'editar',
-      modulo:    'configuracoes',
-      tabela:    'configuracoes',
-      descricao: 'Configurações do sistema atualizadas',
-      nivel:     'info',
-    });
-    mostrarToast('Configurações salvas com sucesso!', 'success');
-  } else {
-    mostrarToast('Erro ao salvar configurações.', 'error');
-  }
-}
 
 
 /* =====================================================
