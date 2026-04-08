@@ -625,16 +625,16 @@ function exportarCSV() {
   // Regras
   if (regrasLista.length) {
     linhas.push(['=== REGRAS DE ACESSO ===']);
-    linhas.push(['"Nome"', '"Área"', '"Grupo"', '"Dias"', '"Horário Início"', '"Horário Fim"', '"Ativo"']);
+    linhas.push(['"Nome"', '"Área"', '"Grupo"', '"Dias"', '"Horário Início"', '"Horário Fim"', '"Ativa"']);
     regrasLista.forEach(r => {
       linhas.push([
-        `"${r.nome        || ''}"`,
-        `"${r.area        || ''}"`,
-        `"${r.grupo       || ''}"`,
-        `"${r.dias        || ''}"`,
-        `"${r.horario_inicio || ''}"`,
-        `"${r.horario_fim || ''}"`,
-        `"${r.ativo ? 'Sim' : 'Não'}"`,
+        `"${r.nome              || ''}"`,
+        `"${r.areas?.nome       || ''}"`,
+        `"${r.grupos?.nome      || ''}"`,
+        `"${(r.dias_semana || []).join(', ')}"`,
+        `"${r.horario_inicio    || ''}"`,
+        `"${r.horario_fim       || ''}"`,
+        `"${r.status === 'ativa' ? 'Sim' : 'Não'}"`,
       ].join(','));
     });
     linhas.push(['']);
@@ -662,7 +662,7 @@ function exportarCSV() {
       linhas.push([
         `"${a.nome          || ''}"`,
         `"${a.descricao     || ''}"`,
-        `"${a.nivel_acesso  || ''}"`,
+        `"${a.nivel_restricao || ''}"`,
       ].join(','));
     });
   }
