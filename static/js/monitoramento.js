@@ -75,7 +75,6 @@ const Monitoramento = (() => {
       document.body.style.overflow = '';
       btnConfirmar.removeEventListener('click', onConfirmar);
       btnCancelar.removeEventListener('click', fechar);
-      modal.removeEventListener('click', onOverlay);
     };
 
     const onConfirmar = () => {
@@ -210,7 +209,6 @@ const Monitoramento = (() => {
       document.body.style.overflow = '';
       btnConf.removeEventListener('click', onConfirmar);
       btnCancel.removeEventListener('click', fechar);
-      modal.removeEventListener('click', onOverlay);
     };
 
     const onConfirmar = () => {
