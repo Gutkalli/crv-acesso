@@ -771,53 +771,61 @@
 </div>
 
 <!-- Modal de confirmação: RESTAURAR -->
-<div class="modal-overlay cfg-hidden" id="modal-confirmar-restaurar">
-  <div class="modal" style="max-width:460px;">
-    <div class="modal-header">
-      <h3 style="display:flex;align-items:center;gap:8px;font-size:1.05rem;font-weight:700;">
-        <i class="ph ph-arrow-counter-clockwise" style="color:var(--warning);font-size:1.3rem;"></i>
-        Restaurar seção
-      </h3>
+<!-- ── Modal: ERRO DE VALIDAÇÃO ── -->
+<div class="modal-overlay cfg-hidden" id="modal-erro-validacao">
+  <div class="modal cfg-modal-validacao" style="max-width:440px;">
+    <div class="cfg-modal-icon-wrap cfg-modal-icon-erro">
+      <i class="ph ph-warning-circle"></i>
     </div>
-    <p id="modal-restaurar-desc" style="margin-top:14px;font-size:0.88rem;color:var(--text-muted);line-height:1.7;">
-      Deseja restaurar esta seção com os valores salvos no banco?
-    </p>
-    <p style="margin-top:8px;font-size:0.82rem;color:var(--warning);display:flex;align-items:center;gap:6px;">
-      <i class="ph ph-warning"></i> Os campos voltarão ao último valor salvo.
-    </p>
-    <div class="modal-footer" style="margin-top:22px;display:flex;gap:10px;justify-content:flex-end;">
-      <button class="btn btn-ghost" id="btn-restaurar-cancelar">
-        <i class="ph ph-x"></i> Cancelar
-      </button>
-      <button class="btn btn-primary" id="btn-restaurar-confirmar">
-        <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
+    <h3 class="cfg-modal-titulo">Campo obrigatório</h3>
+    <p id="modal-erro-desc" class="cfg-modal-desc">Preencha todos os campos obrigatórios antes de salvar.</p>
+    <div class="cfg-modal-footer-center">
+      <button class="btn btn-primary" id="btn-erro-fechar">
+        <i class="ph ph-check"></i> Entendido
       </button>
     </div>
   </div>
 </div>
 
-<!-- Modal de confirmação: SALVAR -->
+<!-- ── Modal: CONFIRMAR SALVAR ── -->
 <div class="modal-overlay cfg-hidden" id="modal-confirmar-salvar">
-  <div class="modal" style="max-width:480px;">
-    <div class="modal-header">
-      <h3 style="font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;display:flex;align-items:center;gap:8px;">
-        <i class="ph ph-warning" style="color:var(--warning);font-size:1.3rem;"></i>
-        Configurações já cadastradas
-      </h3>
+  <div class="modal cfg-modal-confirmar" style="max-width:480px;">
+    <div class="cfg-modal-icon-wrap cfg-modal-icon-salvar">
+      <i class="ph ph-floppy-disk"></i>
     </div>
-    <p id="modal-confirmar-desc" style="margin-top:16px;font-size:0.88rem;color:var(--text-muted);line-height:1.7;">
-      Já existe configuração salva nesta seção.<br>O que deseja fazer?
-    </p>
-    <div class="modal-footer" style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+    <h3 class="cfg-modal-titulo" id="modal-salvar-titulo">Salvar configurações</h3>
+    <p id="modal-confirmar-desc" class="cfg-modal-desc">Deseja salvar as configurações desta seção?</p>
+    <div class="cfg-modal-footer-acoes">
       <button class="btn btn-ghost" id="btn-confirmar-cancelar">
         <i class="ph ph-x"></i> Cancelar
       </button>
-      <!-- Visível apenas para ADM — apaga só os dados da seção atual -->
-      <button class="btn btn-ghost" id="btn-confirmar-excluir" style="color:var(--danger);border-color:var(--danger);display:none;">
-        <i class="ph ph-trash"></i> Excluir dados desta seção
+      <button class="btn btn-ghost cfg-btn-excluir" id="btn-confirmar-excluir" style="display:none;">
+        <i class="ph ph-trash"></i> Excluir dados
       </button>
       <button class="btn btn-primary" id="btn-confirmar-atualizar">
-        <i class="ph ph-pencil-simple"></i> Atualizar
+        <i class="ph ph-floppy-disk"></i> Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: CONFIRMAR RESTAURAR ── -->
+<div class="modal-overlay cfg-hidden" id="modal-confirmar-restaurar">
+  <div class="modal cfg-modal-confirmar" style="max-width:460px;">
+    <div class="cfg-modal-icon-wrap cfg-modal-icon-restaurar">
+      <i class="ph ph-arrow-counter-clockwise"></i>
+    </div>
+    <h3 class="cfg-modal-titulo">Restaurar padrões</h3>
+    <p id="modal-restaurar-desc" class="cfg-modal-desc">Deseja restaurar esta seção com os valores salvos no banco?</p>
+    <div class="cfg-modal-aviso">
+      <i class="ph ph-warning"></i> Os campos voltarão ao último valor salvo.
+    </div>
+    <div class="cfg-modal-footer-acoes">
+      <button class="btn btn-ghost" id="btn-restaurar-cancelar">
+        <i class="ph ph-x"></i> Cancelar
+      </button>
+      <button class="btn btn-primary" id="btn-restaurar-confirmar">
+        <i class="ph ph-arrow-counter-clockwise"></i> Restaurar
       </button>
     </div>
   </div>
