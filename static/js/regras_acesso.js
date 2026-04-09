@@ -712,3 +712,117 @@ function exportarCSV() {
 
   if (typeof showToast === 'function') showToast('Exportação concluída!', 'success');
 }
+
+/* ============================================================
+   MODAIS PROFISSIONAIS — ALERTA / SUCESSO / CONFIRMAR
+   ============================================================ */
+
+function initModaisExtras() {
+  // Alerta
+  ['modal-alerta-regra-fechar', 'modal-alerta-regra-ok'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', () => fecharOverlay('modal-alerta-regra'));
+  });
+
+  // Sucesso
+  ['modal-sucesso-regra-fechar', 'modal-sucesso-regra-ok'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', () => fecharOverlay('modal-sucesso-regra'));
+  });
+
+  // Confirmar
+  document.getElementById('btn-confirmar-regra-cancelar')?.addEventListener('click', () => {
+    fecharOverlay('modal-confirmar-regra');
+    if (_confirmarResolve) { _confirmarResolve(false); _confirmarResolve = null; }
+  });
+
+  document.getElementById('btn-confirmar-regra-ok')?.addEventListener('click', () => {
+    fecharOverlay('modal-confirmar-regra');
+    if (_confirmarResolve) { _confirmarResolve(true); _confirmarResolve = null; }
+  });
+}
+
+/* --- Alerta genérico ------------------------------------ */
+function mostrarAlerta(msg) {
+  const el = document.getElementById('modal-alerta-regra-msg');
+  if (el) el.textContent = msg;
+  abrirOverlay('modal-alerta-regra');
+}
+
+/* --- Confirm assíncrono --------------------------------- */
+let _confirmarResolve = null;
+
+function confirmarExclusao(msg) {
+  return new Promise(resolve => {
+    _confirmarResolve = resolve;
+    const el = document.getElementById('modal-confirmar-regra-msg');
+    if (el) el.textContent = msg;
+    abrirOverlay('modal-confirmar-regra');
+  });
+}
+
+/* --- Modal sucesso regra -------------------------------- */
+function mostrarModalSucessoRegra(dados, nomeGrupo, nomeArea) {
+  const diasNome = { 0:'Dom', 1:'Seg', 2:'Ter', 3:'Qua', 4:'Qui', 5:'Sex', 6:'Sáb' };
+  const diasStr  = (dados.dias_semana || []).map(d => diasNome[d] || d).join(', ') || '—';
+
+  const horario = (dados.horario_inicio && dados.horario_fim)
+    ? `${dados.horario_inicio} → ${dados.horario_fim}`
+    : (dados.horario_inicio || dados.horario_fim || '—');
+
+  const tipoLabel = {
+    horario:'Horário', area:'Área', grupo:'Grupo', excecao:'Exceção'
+  }[dados.tipo] || dados.tipo || '—';
+
+  const prioLabel = {
+    normal:'Normal', alta:'Alta', critica:'Crítica'
+  }[dados.prioridade] || dados.prioridade || 'Normal';
+
+  const prioColor = { normal:'var(--primary)', alta:'var(--warning)', critica:'var(--danger)' }[dados.prioridade] || 'var(--primary)';
+
+  const statusBadge = dados.status === 'ativa'
+    ? '<span class="badge badge-success">Ativa</span>'
+    : '<span class="badge badge-neutral">Inativa</span>';
+
+  const body = document.getElementById('modal-sucesso-regra-body');
+  if (!body) return;
+
+  body.innerHTML = `
+    <div class="regra-sucesso-hero">
+      <div class="regra-sucesso-icone">
+        <i class="ph ph-shield-check"></i>
+      </div>
+      <div class="regra-sucesso-nome">${dados.nome}</div>
+    </div>
+    <div class="regra-sucesso-grid">
+      <div class="regra-sucesso-item">
+        <span class="regra-sucesso-label">Tipo</span>
+        <span>${tipoLabel}</span>
+      </div>
+      <div class="regra-sucesso-item">
+        <span class="regra-sucesso-label">Prioridade</span>
+        <span style="color:${prioColor};font-weight:600;">${prioLabel}</span>
+      </div>
+      <div class="regra-sucesso-item">
+        <span class="regra-sucesso-label">Grupo</span>
+        <span>${nomeGrupo || '—'}</span>
+      </div>
+      <div class="regra-sucesso-item">
+        <span class="regra-sucesso-label">Área</span>
+        <span>${nomeArea || '—'}</span>
+      </div>
+      <div class="regra-sucesso-item">
+        <span class="regra-sucesso-label">Horário</span>
+        <span>${horario}</span>
+      </div>
+      <div class="regra-sucesso-item">
+        <span class="regra-sucesso-label">Dias</span>
+        <span>${diasStr}</span>
+      </div>
+      <div class="regra-sucesso-item" style="grid-column:1/-1;">
+        <span class="regra-sucesso-label">Status</span>
+        <span>${statusBadge}</span>
+      </div>
+    </div>
+  `;
+
+  abrirOverlay('modal-sucesso-regra');
+}
