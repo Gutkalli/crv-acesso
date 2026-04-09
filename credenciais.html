@@ -282,6 +282,57 @@
   </div><!-- fecha .func-modal -->
 </div><!-- fecha .modal-overlay -->
 
+<!-- Modal: Exportar Credenciais -->
+<div class="modal-overlay func-table-hidden" id="modal-exportar-cred">
+  <div class="func-modal" style="max-width:520px;">
+
+    <button class="func-modal-close" id="modal-export-cred-fechar">
+      <i class="ph ph-x"></i>
+    </button>
+
+    <div class="func-modal-title">
+      <i class="ph ph-download-simple"></i>
+      <span>Exportar Credenciais</span>
+    </div>
+
+    <!-- Estado vazio -->
+    <div id="export-cred-empty" style="display:none;text-align:center;padding:32px 16px;">
+      <i class="ph ph-key" style="font-size:3rem;opacity:.18;display:block;margin-bottom:12px;color:var(--text-primary);"></i>
+      <p style="font-size:0.9rem;color:var(--text-muted);margin:0;">Nenhuma credencial cadastrada para exportar.<br>Adicione credenciais antes de exportar.</p>
+    </div>
+
+    <!-- Estado com dados -->
+    <div id="export-cred-dados">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+        <div style="width:52px;height:52px;background:rgba(0,145,173,0.10);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i class="ph ph-key" style="font-size:1.5rem;color:var(--primary);"></i>
+        </div>
+        <div>
+          <div style="font-size:1.6rem;font-weight:700;color:var(--text-primary);line-height:1;" id="export-cred-count">0</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">credenciais prontas para exportar</div>
+        </div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:4px;">
+        <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 8px;">
+          <i class="ph ph-info" style="color:var(--primary);"></i>
+          O arquivo CSV será exportado com as seguintes colunas, separadas por <strong>ponto e vírgula (;)</strong>:
+        </p>
+        <code style="font-size:0.78rem;color:var(--primary);display:block;padding:6px 10px;background:var(--surface);border-radius:4px;">
+          Funcionário ; Tipo ; Status ; Código ; Cadastrado em
+        </code>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-export-cred-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-export-cred-confirmar">
+        <i class="ph ph-download-simple"></i> Exportar CSV
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <script src="static/js/core/supabase.js"></script>
 <script src="static/js/core/network.js"></script>
 <script src="static/js/auth.js"></script>
