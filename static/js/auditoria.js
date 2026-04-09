@@ -417,41 +417,76 @@ function abrirDetalheLog(log) {
    AÇÕES DO CABEÇALHO
    ===================================================== */
 
+let _dadosAuditoriaExport = [];
+
 function initAcoes() {
-  document.getElementById('btn-audit-exportar')?.addEventListener('click', exportarCSV);
+  document.getElementById('btn-audit-exportar')?.addEventListener('click', prepararExportacaoAudit);
+  initModalExportarAudit();
 }
 
-async function exportarCSV() {
+function initModalExportarAudit() {
+  document.getElementById('modal-export-audit-fechar')?.addEventListener('click',  fecharModalExportarAudit);
+  document.getElementById('btn-export-audit-cancelar')?.addEventListener('click',  fecharModalExportarAudit);
+  document.getElementById('btn-export-audit-confirmar')?.addEventListener('click', () => {
+    _executarDownloadAudit(_dadosAuditoriaExport);
+    fecharModalExportarAudit();
+  });
+}
+
+function fecharModalExportarAudit() {
+  document.getElementById('modal-exportar-audit')?.classList.add('audit-hidden');
+  document.body.style.overflow = '';
+}
+
+async function prepararExportacaoAudit() {
   const supabase = window.getSupabase();
   if (!supabase) return;
-  const f = getFiltros();
+  const f   = getFiltros();
   const btn = document.getElementById('btn-audit-exportar');
 
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ph ph-spinner"></i> Exportando...';
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="ph ph-spinner"></i> Buscando...';
 
   let query = supabase
     .from('auditoria')
-    .select(`
-      id, acao, modulo, descricao, ip, nivel, registro_id, data,
-      usuarios ( nome, email )
-    `)
+    .select(`id, acao, modulo, descricao, ip, nivel, registro_id, data, usuarios ( nome, email )`)
     .order('data', { ascending: false });
 
   if (f.modulo)  query = query.eq('modulo', f.modulo);
   if (f.acao)    query = query.eq('acao',   f.acao);
   if (f.nivel)   query = query.eq('nivel',  f.nivel);
-  if (f.dataIni) query = query.gte('data', new Date(f.dataIni + 'T00:00:00').toISOString());
-  if (f.dataFim) query = query.lte('data', new Date(f.dataFim + 'T23:59:59').toISOString());
+  if (f.dataIni) query = query.gte('data',  new Date(f.dataIni + 'T00:00:00').toISOString());
+  if (f.dataFim) query = query.lte('data',  new Date(f.dataFim + 'T23:59:59').toISOString());
 
   const { data } = await query;
+  _dadosAuditoriaExport = data || [];
 
-  if (!data || !data.length) {
-    alert('Nenhum dado para exportar com os filtros aplicados.');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ph ph-download-simple"></i> Exportar';
-    return;
-  }
+  btn.disabled  = false;
+  btn.innerHTML = '<i class="ph ph-download-simple"></i> Exportar';
+
+  // Mostrar modal com resultado
+  const overlay  = document.getElementById('modal-exportar-audit');
+  const emptyEl  = document.getElementById('export-audit-empty');
+  const dadosEl  = document.getElementById('export-audit-dados');
+  const countEl  = document.getElementById('export-audit-count');
+  const btnConf  = document.getElementById('btn-export-audit-confirmar');
+
+  const temDados = _dadosAuditoriaExport.length > 0;
+  if (emptyEl) emptyEl.style.display = temDados ? 'none'  : 'block';
+  if (dadosEl) dadosEl.style.display = temDados ? 'block' : 'none';
+  if (countEl) countEl.textContent   = _dadosAuditoriaExport.length;
+  if (btnConf) btnConf.disabled      = !temDados;
+
+  overlay?.classList.remove('audit-hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+async function exportarCSV() {
+  await prepararExportacaoAudit();
+}
+
+function _executarDownloadAudit(data) {
+  if (!data || !data.length) return;
 
   const colunas = ['Data/Hora', 'Usuário', 'Ação', 'Módulo', 'Descrição', 'IP', 'Nível'];
   const linhas  = data.map(r => [
