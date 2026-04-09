@@ -309,6 +309,61 @@
   </div>
 </div>
 
+<!-- Modal: Exportar Equipamentos -->
+<div class="modal-overlay equip-hidden" id="modal-exportar-equip">
+  <div class="equip-modal" style="max-width:520px;">
+
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="ph ph-download-simple"></i> Exportar Equipamentos
+      </h3>
+      <button class="modal-close" id="modal-export-equip-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Estado vazio -->
+      <div id="export-equip-empty" style="display:none;text-align:center;padding:24px 16px;">
+        <i class="ph ph-devices" style="font-size:3rem;opacity:.18;display:block;margin-bottom:12px;color:var(--text-primary);"></i>
+        <p style="font-size:0.9rem;color:var(--text-muted);margin:0;">Nenhum equipamento cadastrado para exportar.<br>Adicione equipamentos antes de exportar.</p>
+      </div>
+
+      <!-- Estado com dados -->
+      <div id="export-equip-dados">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+          <div style="width:52px;height:52px;background:rgba(0,145,173,0.10);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="ph ph-devices" style="font-size:1.5rem;color:var(--primary);"></i>
+          </div>
+          <div>
+            <div style="font-size:1.6rem;font-weight:700;color:var(--text-primary);line-height:1;" id="export-equip-count">0</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">equipamentos prontos para exportar</div>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+          <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 8px;">
+            <i class="ph ph-info" style="color:var(--primary);"></i>
+            Colunas exportadas, separadas por <strong>vírgula (,)</strong>:
+          </p>
+          <code style="font-size:0.75rem;color:var(--primary);display:block;padding:6px 10px;background:var(--surface);border-radius:4px;">
+            Nome , Tipo , IP , Porta , Localização , Sentido , Firmware , Status , Último Contato
+          </code>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-export-equip-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-export-equip-confirmar">
+        <i class="ph ph-download-simple"></i> Exportar CSV
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <script src="static/js/core/supabase.js"></script>
 <script src="static/js/core/network.js"></script>
 <script src="static/js/core/session.js"></script>
