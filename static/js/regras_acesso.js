@@ -643,14 +643,44 @@ function setVal(id, val) {
 }
 
 /* ============================================================
+   MODAL EXPORTAR REGRAS DE ACESSO
+   ============================================================ */
+
+function abrirModalExportarRegras() {
+  const overlay  = document.getElementById('modal-exportar-regras');
+  const emptyEl  = document.getElementById('export-regras-empty');
+  const dadosEl  = document.getElementById('export-regras-dados');
+  const btnConf  = document.getElementById('btn-export-regras-confirmar');
+  if (!overlay) return;
+
+  const total = regrasLista.length + gruposLista.length + areasLista.length;
+  const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+  el('export-regras-count-regras', regrasLista.length);
+  el('export-regras-count-grupos', gruposLista.length);
+  el('export-regras-count-areas',  areasLista.length);
+
+  if (emptyEl) emptyEl.style.display = total ? 'none'  : 'block';
+  if (dadosEl) dadosEl.style.display = total ? 'block' : 'none';
+  if (btnConf) btnConf.disabled      = !total;
+
+  abrirOverlay('modal-exportar-regras');
+}
+
+function initModalExportarRegras() {
+  document.getElementById('modal-export-regras-fechar')?.addEventListener('click',  () => fecharOverlay('modal-exportar-regras'));
+  document.getElementById('btn-export-regras-cancelar')?.addEventListener('click',  () => fecharOverlay('modal-exportar-regras'));
+  document.getElementById('btn-export-regras-confirmar')?.addEventListener('click', () => {
+    fecharOverlay('modal-exportar-regras');
+    exportarCSV();
+  });
+}
+
+/* ============================================================
    EXPORTAR CSV
    ============================================================ */
 function exportarCSV() {
   const totalItens = regrasLista.length + gruposLista.length + areasLista.length;
-  if (!totalItens) {
-    if (typeof showToast === 'function') showToast('Nenhum dado para exportar.', 'warning');
-    return;
-  }
+  if (!totalItens) return;
 
   const linhas = [];
 
