@@ -505,11 +505,10 @@ function _executarDownloadAudit(data) {
   const a    = document.createElement('a');
   a.href     = url;
   a.download = `auditoria_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
-
-  btn.disabled = false;
-  btn.innerHTML = '<i class="ph ph-download-simple"></i> Exportar';
 }
 
 /* =====================================================
