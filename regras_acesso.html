@@ -355,6 +355,75 @@
   </div>
 </div>
 
+<!-- MODAL: EXPORTAR REGRAS -->
+<div class="regra-overlay regra-hidden" id="modal-exportar-regras">
+  <div class="regra-modal-box" style="max-width:520px;">
+
+    <div class="regra-modal-header">
+      <h3 class="regra-modal-titulo">
+        <i class="ph ph-download-simple"></i> Exportar Regras de Acesso
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-icon" id="modal-export-regras-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="regra-modal-body">
+
+      <!-- Estado vazio -->
+      <div id="export-regras-empty" style="display:none;text-align:center;padding:24px 16px;">
+        <i class="ph ph-shield-slash" style="font-size:3rem;opacity:.18;display:block;margin-bottom:12px;color:var(--text-primary);"></i>
+        <p style="font-size:0.9rem;color:var(--text-muted);margin:0;">Nenhum dado cadastrado para exportar.<br>Adicione áreas, grupos ou regras primeiro.</p>
+      </div>
+
+      <!-- Estado com dados -->
+      <div id="export-regras-dados">
+        <!-- Resumo em 3 cards -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="export-regras-count-regras">0</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Regras</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="export-regras-count-grupos">0</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Grupos</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="export-regras-count-areas">0</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">Áreas</div>
+          </div>
+        </div>
+
+        <!-- Colunas exportadas -->
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+          <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 8px;">
+            <i class="ph ph-info" style="color:var(--primary);"></i>
+            Arquivo CSV com seções separadas por <strong>vírgula (,)</strong>:
+          </p>
+          <code style="font-size:0.75rem;color:var(--primary);display:block;padding:5px 10px;background:var(--surface);border-radius:4px;margin-bottom:6px;">
+            Regras: Nome , Área , Grupo , Dias , Início , Fim , Ativa
+          </code>
+          <code style="font-size:0.75rem;color:var(--primary);display:block;padding:5px 10px;background:var(--surface);border-radius:4px;margin-bottom:6px;">
+            Grupos: Nome , Descrição
+          </code>
+          <code style="font-size:0.75rem;color:var(--primary);display:block;padding:5px 10px;background:var(--surface);border-radius:4px;">
+            Áreas: Nome , Descrição , Nível de acesso
+          </code>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="regra-modal-footer">
+      <button class="btn btn-ghost" id="btn-export-regras-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-export-regras-confirmar">
+        <i class="ph ph-download-simple"></i> Exportar CSV
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <!-- MODAL: ALERTA -->
 <div class="regra-overlay regra-hidden" id="modal-alerta-regra">
   <div class="regra-modal-box" style="max-width:420px;">
