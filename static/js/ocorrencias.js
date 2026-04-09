@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   preencherDataAtual();
   carregarOcorrencias();
 
-  document.getElementById('btn-ocorr-exportar')?.addEventListener('click', exportarOcorrencias);
+  initModalExportarOcorr();
+  document.getElementById('btn-ocorr-exportar')?.addEventListener('click', abrirModalExportarOcorr);
 });
 
 
