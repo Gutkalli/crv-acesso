@@ -582,28 +582,40 @@ function editarArea(id) {
    EXCLUIR
    ============================================================ */
 async function excluirRegra(id) {
-  if (!confirm('Excluir esta regra?')) return;
+  const r = regrasLista.find(x => x.id == id);
+  const confirmado = await confirmarExclusao(
+    `Deseja excluir a regra "${r?.nome || 'selecionada'}"? Esta ação não pode ser desfeita.`
+  );
+  if (!confirmado) return;
   const sb = window.getSupabase();
   const { error } = await sb.from('regras_acesso').delete().eq('id', id);
-  if (error) { alert('Erro: ' + error.message); return; }
+  if (error) { mostrarAlerta('Erro ao excluir: ' + error.message); return; }
   await carregarRegras();
   atualizarKPIs();
 }
 
 async function excluirGrupo(id) {
-  if (!confirm('Excluir este grupo?')) return;
+  const g = gruposLista.find(x => x.id == id);
+  const confirmado = await confirmarExclusao(
+    `Deseja excluir o grupo "${g?.nome || 'selecionado'}"? Esta ação não pode ser desfeita.`
+  );
+  if (!confirmado) return;
   const sb = window.getSupabase();
   const { error } = await sb.from('grupos').delete().eq('id', id);
-  if (error) { alert('Erro: ' + error.message); return; }
+  if (error) { mostrarAlerta('Erro ao excluir: ' + error.message); return; }
   await carregarGrupos();
   atualizarKPIs();
 }
 
 async function excluirArea(id) {
-  if (!confirm('Excluir esta área?')) return;
+  const a = areasLista.find(x => x.id == id);
+  const confirmado = await confirmarExclusao(
+    `Deseja excluir a área "${a?.nome || 'selecionada'}"? Esta ação não pode ser desfeita.`
+  );
+  if (!confirmado) return;
   const sb = window.getSupabase();
   const { error } = await sb.from('areas').delete().eq('id', id);
-  if (error) { alert('Erro: ' + error.message); return; }
+  if (error) { mostrarAlerta('Erro ao excluir: ' + error.message); return; }
   await carregarAreas();
   atualizarKPIs();
 }
