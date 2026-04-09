@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initModalEquip();
     initTipoEquip();
     initBusca();
+    initModalExportarEquip();
     carregarDados();
   }, 300);
 });
