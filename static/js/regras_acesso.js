@@ -281,10 +281,10 @@ function abrirModalGrupo(dados) {
 
 async function salvarGrupo() {
   const sb = window.getSupabase();
-  if (!sb) { alert('Banco não conectado.'); return; }
+  if (!sb) { mostrarAlerta('Banco de dados não conectado. Verifique sua conexão.'); return; }
 
   const nome = document.getElementById('g-nome')?.value.trim();
-  if (!nome) { alert('Nome obrigatório.'); return; }
+  if (!nome) { mostrarAlerta('O campo Nome do grupo é obrigatório.'); return; }
 
   const dados = {
     nome,
@@ -295,12 +295,13 @@ async function salvarGrupo() {
     ? await sb.from('grupos').update(dados).eq('id', grupoEditando)
     : await sb.from('grupos').insert([dados]);
 
-  if (response.error) { alert('Erro: ' + response.error.message); return; }
+  if (response.error) { mostrarAlerta('Erro ao salvar grupo: ' + response.error.message); return; }
 
   fecharOverlay('modal-grupo');
   grupoEditando = null;
   await carregarGrupos();
   atualizarKPIs();
+  if (typeof showToast === 'function') showToast(`Grupo "${nome}" salvo com sucesso!`, 'success');
 }
 
 /* ============================================================
