@@ -545,45 +545,86 @@ function initViewToggle() {
 }
 
 /* ============================================================
-   IMPORTAR / EXPORTAR (CORRIGIDO)
+   MÁSCARA CPF
+   ============================================================ */
+function initMascaraCPF() {
+  const campo = document.getElementById('f-cpf');
+  if (!campo) return;
+  campo.addEventListener('input', function () {
+    let d = this.value.replace(/\D/g, '').slice(0, 11);
+    if      (d.length > 9) d = d.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+    else if (d.length > 6) d = d.replace(/(\d{3})(\d{3})(\d+)/,            '$1.$2.$3');
+    else if (d.length > 3) d = d.replace(/(\d{3})(\d+)/,                   '$1.$2');
+    this.value = d;
+  });
+}
+
+/* ============================================================
+   IMPORTAR / EXPORTAR
    ============================================================ */
 function initImportExport() {
   document.getElementById('btn-importar')?.addEventListener('click', abrirModalImportar);
   document.getElementById('btn-importar-empty')?.addEventListener('click', abrirModalImportar);
-  document.getElementById('btn-exportar')?.addEventListener('click', exportarCSV);
+  document.getElementById('btn-exportar')?.addEventListener('click', abrirModalExportar);
   initModalImportar();
+  initModalExportar();
 }
 
-function exportarCSV() {
+/* ============================================================
+   MODAL EXPORTAR
+   ============================================================ */
+function abrirModalExportar() {
+  const overlay  = document.getElementById('modal-exportar');
+  const emptyEl  = document.getElementById('export-empty');
+  const dadosEl  = document.getElementById('export-dados');
+  const countEl  = document.getElementById('export-count');
+  const btnConf  = document.getElementById('btn-export-confirmar');
+  if (!overlay) return;
 
-  if (!funcionariosLista.length) {
-    alert('Nenhum funcionário para exportar.');
-    return;
-  }
+  const temDados = funcionariosLista.length > 0;
+  if (emptyEl) emptyEl.style.display = temDados ? 'none'  : 'block';
+  if (dadosEl) dadosEl.style.display = temDados ? 'block' : 'none';
+  if (countEl) countEl.textContent   = funcionariosLista.length;
+  if (btnConf) btnConf.disabled      = !temDados;
 
+  overlay.classList.remove('func-table-hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModalExportar() {
+  document.getElementById('modal-exportar')?.classList.add('func-table-hidden');
+  document.body.style.overflow = '';
+}
+
+function initModalExportar() {
+  document.getElementById('modal-export-fechar')?.addEventListener('click',   fecharModalExportar);
+  document.getElementById('btn-export-cancelar')?.addEventListener('click',   fecharModalExportar);
+  document.getElementById('btn-export-confirmar')?.addEventListener('click',  () => {
+    _executarExportacao();
+    fecharModalExportar();
+  });
+}
+
+function _executarExportacao() {
   const cabecalho = ['Nome', 'CPF', 'Matrícula', 'Cargo', 'Status'];
-
   const linhas = funcionariosLista.map(f => [
-    f.nome || '',
-    f.cpf  || '',
+    f.nome      || '',
+    f.cpf       || '',
     f.matricula || '',
-    f.cargo || '',
-    f.status || '',
+    f.cargo     || '',
+    f.status    || '',
   ]);
-
-  const csv = [cabecalho, ...linhas]
+  const csv  = [cabecalho, ...linhas]
     .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'))
     .join('\n');
-
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `funcionarios_${new Date().toISOString().slice(0,10)}.csv`;
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `funcionarios_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
   a.click();
-
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
