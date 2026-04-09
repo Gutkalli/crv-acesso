@@ -17,10 +17,11 @@ if (!sb) {
   initModal();
   initTabs();
   initBusca();
+  initModalExportarCred();
 
   carregarCredenciais();
 
-  document.getElementById('btn-cred-exportar')?.addEventListener('click', exportarCredenciais);
+  document.getElementById('btn-cred-exportar')?.addEventListener('click', abrirModalExportarCred);
 
 });
 
