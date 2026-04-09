@@ -731,6 +731,85 @@
 }
 
 /* =====================================================
+   MODAL SUCESSO — REGRA
+   ===================================================== */
+
+.regra-sucesso-header {
+  background: var(--success);
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+  padding: 18px 24px;
+}
+
+.regra-sucesso-hero {
+  text-align: center;
+  padding: 20px 24px 8px;
+}
+
+.regra-sucesso-icone {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, .12);
+  color: var(--success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.9rem;
+  margin: 0 auto 12px;
+}
+
+.regra-sucesso-nome {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.regra-sucesso-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0 24px 24px;
+}
+
+.regra-sucesso-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.regra-sucesso-item:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+.regra-sucesso-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+}
+
+/* =====================================================
+   BTN DANGER
+   ===================================================== */
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border: 1px solid var(--danger);
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+/* =====================================================
    RESPONSIVO
    ===================================================== */
 

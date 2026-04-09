@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initModalGrupo();
   initModalArea();
   initBusca();
+  initModaisExtras();
   carregarTudo();
 
   // Exportar
