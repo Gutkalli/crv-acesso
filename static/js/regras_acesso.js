@@ -31,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initModalArea();
   initBusca();
   initModaisExtras();
+  initModalExportarRegras();
   carregarTudo();
 
-  // Exportar
-  document.getElementById('btn-exportar')?.addEventListener('click', exportarCSV);
+  document.getElementById('btn-exportar')?.addEventListener('click', abrirModalExportarRegras);
 });
 
 /* ============================================================
