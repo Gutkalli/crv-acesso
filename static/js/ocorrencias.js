@@ -645,16 +645,49 @@ function preencherDataAtual() {
 
 
 /* ============================================================
+   MODAL EXPORTAR OCORRÊNCIAS
+   ============================================================ */
+
+function abrirModalExportarOcorr() {
+  const overlay  = document.getElementById('modal-exportar-ocorr');
+  const emptyEl  = document.getElementById('export-ocorr-empty');
+  const dadosEl  = document.getElementById('export-ocorr-dados');
+  const countEl  = document.getElementById('export-ocorr-count');
+  const btnConf  = document.getElementById('btn-export-ocorr-confirmar');
+  if (!overlay) return;
+
+  const temDados = ocorrenciasLista.length > 0;
+  if (emptyEl) emptyEl.style.display = temDados ? 'none'  : 'block';
+  if (dadosEl) dadosEl.style.display = temDados ? 'block' : 'none';
+  if (countEl) countEl.textContent   = ocorrenciasLista.length;
+  if (btnConf) btnConf.disabled      = !temDados;
+
+  overlay.classList.remove('ocorr-hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModalExportarOcorr() {
+  document.getElementById('modal-exportar-ocorr')?.classList.add('ocorr-hidden');
+  document.body.style.overflow = '';
+}
+
+function initModalExportarOcorr() {
+  document.getElementById('modal-export-ocorr-fechar')?.addEventListener('click',  fecharModalExportarOcorr);
+  document.getElementById('btn-export-ocorr-cancelar')?.addEventListener('click',  fecharModalExportarOcorr);
+  document.getElementById('btn-export-ocorr-confirmar')?.addEventListener('click', () => {
+    exportarOcorrencias();
+    fecharModalExportarOcorr();
+  });
+}
+
+/* ============================================================
    EXPORTAR CSV
    ============================================================ */
 
 function exportarOcorrencias() {
   const lista = ocorrenciasLista;
 
-  if (!lista.length) {
-    alert('Nenhuma ocorrência para exportar.');
-    return;
-  }
+  if (!lista.length) return;
 
   const BOM = '\uFEFF';
   const sep = ';';
