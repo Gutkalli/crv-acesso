@@ -355,6 +355,67 @@
   </div>
 </div>
 
+<!-- MODAL: ALERTA -->
+<div class="regra-overlay regra-hidden" id="modal-alerta-regra">
+  <div class="regra-modal-box" style="max-width:420px;">
+    <div class="regra-modal-header">
+      <h3 class="regra-modal-titulo">
+        <i class="ph ph-warning-circle" style="color:var(--danger);font-size:1.3rem;"></i>
+        <span id="modal-alerta-regra-titulo">Atenção</span>
+      </h3>
+    </div>
+    <div class="regra-modal-body" style="text-align:center;padding:28px 24px 16px;">
+      <p id="modal-alerta-regra-msg" style="font-size:0.95rem;color:var(--text);line-height:1.6;margin:0;"></p>
+    </div>
+    <div class="regra-modal-footer" style="justify-content:center;">
+      <button class="btn btn-primary" id="modal-alerta-regra-ok">Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SUCESSO REGRA -->
+<div class="regra-overlay regra-hidden" id="modal-sucesso-regra">
+  <div class="regra-modal-box" style="max-width:480px;">
+    <div class="regra-modal-header regra-sucesso-header">
+      <h3 class="regra-modal-titulo" style="color:#fff;">
+        <i class="ph ph-check-circle"></i> Regra salva com sucesso!
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-icon" id="modal-sucesso-regra-fechar" style="color:rgba(255,255,255,.8);">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+    <div class="regra-modal-body" id="modal-sucesso-regra-body" style="padding:0;">
+      <!-- preenchido por JS -->
+    </div>
+    <div class="regra-modal-footer" style="justify-content:center;">
+      <button class="btn btn-primary" id="modal-sucesso-regra-ok">
+        <i class="ph ph-check"></i> Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR EXCLUSÃO -->
+<div class="regra-overlay regra-hidden" id="modal-confirmar-regra">
+  <div class="regra-modal-box" style="max-width:420px;">
+    <div class="regra-modal-header">
+      <h3 class="regra-modal-titulo">
+        <i class="ph ph-trash" style="color:var(--danger);font-size:1.3rem;"></i>
+        <span id="modal-confirmar-regra-titulo">Confirmar Exclusão</span>
+      </h3>
+    </div>
+    <div class="regra-modal-body" style="text-align:center;padding:28px 24px 16px;">
+      <p id="modal-confirmar-regra-msg" style="font-size:0.95rem;color:var(--text);line-height:1.6;margin:0;"></p>
+    </div>
+    <div class="regra-modal-footer">
+      <button class="btn btn-ghost" id="btn-confirmar-regra-cancelar">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirmar-regra-ok">
+        <i class="ph ph-trash"></i> Excluir
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- SCRIPTS — ordem idêntica ao funcionarios.html -->
 <script src="static/js/core/supabase.js"></script>
 <script src="static/js/core/api.js"></script>
