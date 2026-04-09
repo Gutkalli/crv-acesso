@@ -281,6 +281,61 @@
   </div>
 </div>
 
+<!-- Modal: Exportar Ocorrências -->
+<div class="modal-overlay ocorr-hidden" id="modal-exportar-ocorr">
+  <div class="modal ocorr-modal" style="max-width:520px;">
+
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="ph ph-download-simple"></i> Exportar Ocorrências
+      </h3>
+      <button class="modal-close" id="modal-export-ocorr-fechar">
+        <i class="ph ph-x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Estado vazio -->
+      <div id="export-ocorr-empty" style="display:none;text-align:center;padding:24px 16px;">
+        <i class="ph ph-warning-circle" style="font-size:3rem;opacity:.18;display:block;margin-bottom:12px;color:var(--text-primary);"></i>
+        <p style="font-size:0.9rem;color:var(--text-muted);margin:0;">Nenhuma ocorrência registrada para exportar.</p>
+      </div>
+
+      <!-- Estado com dados -->
+      <div id="export-ocorr-dados">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+          <div style="width:52px;height:52px;background:rgba(0,145,173,0.10);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="ph ph-warning-circle" style="font-size:1.5rem;color:var(--primary);"></i>
+          </div>
+          <div>
+            <div style="font-size:1.6rem;font-weight:700;color:var(--text-primary);line-height:1;" id="export-ocorr-count">0</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">ocorrências prontas para exportar</div>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;">
+          <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 8px;">
+            <i class="ph ph-info" style="color:var(--primary);"></i>
+            Colunas exportadas, separadas por <strong>ponto e vírgula (;)</strong>:
+          </p>
+          <code style="font-size:0.78rem;color:var(--primary);display:block;padding:6px 10px;background:var(--surface);border-radius:4px;">
+            Tipo ; Prioridade ; Status ; Funcionário ; Local ; Responsável ; Data/Hora ; Descrição
+          </code>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-export-ocorr-cancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btn-export-ocorr-confirmar">
+        <i class="ph ph-download-simple"></i> Exportar CSV
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <script src="static/js/core/supabase.js"></script>
 <script src="static/js/core/network.js"></script>
 <script src="static/js/core/session.js"></script>
