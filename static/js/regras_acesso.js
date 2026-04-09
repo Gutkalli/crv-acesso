@@ -339,10 +339,10 @@ function abrirModalArea(dados) {
 
 async function salvarArea() {
   const sb = window.getSupabase();
-  if (!sb) { alert('Banco não conectado.'); return; }
+  if (!sb) { mostrarAlerta('Banco de dados não conectado. Verifique sua conexão.'); return; }
 
   const nome = document.getElementById('a-nome')?.value.trim();
-  if (!nome) { alert('Nome obrigatório.'); return; }
+  if (!nome) { mostrarAlerta('O campo Nome da área é obrigatório.'); return; }
 
   const dados = {
     nome,
@@ -354,12 +354,13 @@ async function salvarArea() {
     ? await sb.from('areas').update(dados).eq('id', areaEditando)
     : await sb.from('areas').insert([dados]);
 
-  if (response.error) { alert('Erro: ' + response.error.message); return; }
+  if (response.error) { mostrarAlerta('Erro ao salvar área: ' + response.error.message); return; }
 
   fecharOverlay('modal-area');
   areaEditando = null;
   await carregarAreas();
   atualizarKPIs();
+  if (typeof showToast === 'function') showToast(`Área "${nome}" salva com sucesso!`, 'success');
 }
 
 /* ============================================================
