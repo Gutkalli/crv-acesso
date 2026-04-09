@@ -341,16 +341,49 @@ if (!sb) {
 
 
 /* ============================================================
+   MODAL EXPORTAR CREDENCIAIS
+   ============================================================ */
+
+function abrirModalExportarCred() {
+  const overlay  = document.getElementById('modal-exportar-cred');
+  const emptyEl  = document.getElementById('export-cred-empty');
+  const dadosEl  = document.getElementById('export-cred-dados');
+  const countEl  = document.getElementById('export-cred-count');
+  const btnConf  = document.getElementById('btn-export-cred-confirmar');
+  if (!overlay) return;
+
+  const temDados = credenciaisLista.length > 0;
+  if (emptyEl) emptyEl.style.display = temDados ? 'none'  : 'block';
+  if (dadosEl) dadosEl.style.display = temDados ? 'block' : 'none';
+  if (countEl) countEl.textContent   = credenciaisLista.length;
+  if (btnConf) btnConf.disabled      = !temDados;
+
+  overlay.classList.remove('func-table-hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModalExportarCred() {
+  document.getElementById('modal-exportar-cred')?.classList.add('func-table-hidden');
+  document.body.style.overflow = '';
+}
+
+function initModalExportarCred() {
+  document.getElementById('modal-export-cred-fechar')?.addEventListener('click',  fecharModalExportarCred);
+  document.getElementById('btn-export-cred-cancelar')?.addEventListener('click',  fecharModalExportarCred);
+  document.getElementById('btn-export-cred-confirmar')?.addEventListener('click', () => {
+    exportarCredenciais();
+    fecharModalExportarCred();
+  });
+}
+
+/* ============================================================
    EXPORTAR CSV
    ============================================================ */
 
 function exportarCredenciais() {
   const lista = credenciaisLista;
 
-  if (!lista.length) {
-    alert('Nenhuma credencial para exportar.');
-    return;
-  }
+  if (!lista.length) return;
 
   const BOM = '\uFEFF';
   const sep = ';';
