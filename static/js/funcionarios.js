@@ -6,6 +6,7 @@ console.log('🚀 FUNCIONARIOS iniciado');
 
 document.addEventListener('DOMContentLoaded', () => {
   initModal();
+  initMascaraCPF();
   initViewToggle();
   initBusca();
   initImportExport();
