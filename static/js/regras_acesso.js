@@ -214,23 +214,32 @@ function preencherSelectsRegra() {
 
 async function salvarRegra() {
   const sb = window.getSupabase();
-  if (!sb) { alert('Banco não conectado.'); return; }
+  if (!sb) { mostrarAlerta('Banco de dados não conectado. Verifique sua conexão.'); return; }
 
   const nome = document.getElementById('r-nome')?.value.trim();
   const tipo = document.getElementById('r-tipo')?.value;
-  if (!nome || !tipo) { alert('Preencha nome e tipo.'); return; }
+
+  if (!nome && !tipo) {
+    mostrarAlerta('Preencha o nome e o tipo da regra antes de salvar.');
+    return;
+  }
+  if (!nome) { mostrarAlerta('O campo Nome é obrigatório.'); return; }
+  if (!tipo) { mostrarAlerta('Selecione um Tipo para a regra.'); return; }
 
   const dias = [];
   document.querySelectorAll('.regra-dia input').forEach(cb => {
     if (cb.checked) dias.push(Number(cb.value));
   });
 
+  const grupoId = document.getElementById('r-grupo')?.value || null;
+  const areaId  = document.getElementById('r-area')?.value  || null;
+
   const dados = {
     nome,
     tipo,
     prioridade:     document.getElementById('r-prioridade')?.value || 'normal',
-    grupo_id:       document.getElementById('r-grupo')?.value      || null,
-    area_id:        document.getElementById('r-area')?.value       || null,
+    grupo_id:       grupoId || null,
+    area_id:        areaId  || null,
     horario_inicio: document.getElementById('r-hora-inicio')?.value || null,
     horario_fim:    document.getElementById('r-hora-fim')?.value    || null,
     dias_semana:    dias,
@@ -241,12 +250,20 @@ async function salvarRegra() {
     ? await sb.from('regras_acesso').update(dados).eq('id', regraEditando)
     : await sb.from('regras_acesso').insert([dados]);
 
-  if (response.error) { alert('Erro: ' + response.error.message); return; }
+  if (response.error) {
+    mostrarAlerta('Erro ao salvar: ' + response.error.message);
+    return;
+  }
+
+  const nomeGrupo = gruposLista.find(g => g.id == grupoId)?.nome || null;
+  const nomeArea  = areasLista.find(a => a.id == areaId)?.nome   || null;
 
   fecharOverlay('modal-regra');
   regraEditando = null;
   await carregarRegras();
   atualizarKPIs();
+
+  mostrarModalSucessoRegra(dados, nomeGrupo, nomeArea);
 }
 
 function abrirModalGrupo(dados) {
