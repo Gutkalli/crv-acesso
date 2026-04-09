@@ -337,14 +337,47 @@ function initBusca() {
   filtroTipo?.addEventListener('change',  aplicar);
   filtroStatus?.addEventListener('change', aplicar);
 
-  document.getElementById('btn-equip-exportar')?.addEventListener('click', exportarCSV);
+  document.getElementById('btn-equip-exportar')?.addEventListener('click', abrirModalExportarEquip);
+}
+
+/* ============================================================
+   MODAL EXPORTAR EQUIPAMENTOS
+   ============================================================ */
+
+function abrirModalExportarEquip() {
+  const overlay = document.getElementById('modal-exportar-equip');
+  const emptyEl = document.getElementById('export-equip-empty');
+  const dadosEl = document.getElementById('export-equip-dados');
+  const countEl = document.getElementById('export-equip-count');
+  const btnConf = document.getElementById('btn-export-equip-confirmar');
+  if (!overlay) return;
+
+  const temDados = equipLista.length > 0;
+  if (emptyEl) emptyEl.style.display = temDados ? 'none'  : 'block';
+  if (dadosEl) dadosEl.style.display = temDados ? 'block' : 'none';
+  if (countEl) countEl.textContent   = equipLista.length;
+  if (btnConf) btnConf.disabled      = !temDados;
+
+  overlay.classList.remove('equip-hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModalExportarEquip() {
+  document.getElementById('modal-exportar-equip')?.classList.add('equip-hidden');
+  document.body.style.overflow = '';
+}
+
+function initModalExportarEquip() {
+  document.getElementById('modal-export-equip-fechar')?.addEventListener('click',  fecharModalExportarEquip);
+  document.getElementById('btn-export-equip-cancelar')?.addEventListener('click',  fecharModalExportarEquip);
+  document.getElementById('btn-export-equip-confirmar')?.addEventListener('click', () => {
+    exportarCSV();
+    fecharModalExportarEquip();
+  });
 }
 
 function exportarCSV() {
-  if (!equipLista.length) {
-    if (typeof showToast === 'function') showToast('Nenhum equipamento para exportar.', 'warning');
-    return;
-  }
+  if (!equipLista.length) return;
 
   const headers = ['Nome', 'Tipo', 'IP', 'Porta', 'Localização', 'Sentido', 'Firmware', 'Status', 'Último Contato'];
   const rows = equipLista.map(e => [
